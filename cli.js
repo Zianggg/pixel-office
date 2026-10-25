@@ -1,6 +1,6 @@
 // office on|off|status|demo — turns the Pixel Office hooks and server on or off.
 import { spawn } from 'node:child_process';
-import { readFileSync, rmSync } from 'node:fs';
+import { readdirSync, readFileSync, rmdirSync, rmSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -83,7 +83,10 @@ async function on(project) {
   }
   console.log(`✓ Server văn phòng đang chạy: ${base}`);
   if (openBrowser()) console.log('✓ Đã mở trình duyệt');
-  console.log('⚠ Phiên Claude nào đang mở từ trước cần mở lại mới được theo dõi');
+  // Verified with Claude Code 2.1.310: open sessions pick up the hooks at once; only sessions opened in
+  // this exact folder read its settings, so subfolders (game projects) need their own --project.
+  console.log(`✓ Hook có hiệu lực ngay, kể cả với phiên Claude đang mở tại ${project}`);
+  console.log(`⚠ Phiên mở ở thư mục con không được theo dõi — chạy thêm: office on --project <thư mục con>`);
 }
 
 async function off(project) {
@@ -92,8 +95,10 @@ async function off(project) {
   if (hasOfficeHooks(settings, hookUrl(port))) {
     const rest = removeOfficeHooks(settings, hookUrl(port));
     // Nothing else left means `on` created the file — remove it so the project is exactly as before.
-    if (Object.keys(rest).length === 0) rmSync(file, { force: true });
-    else writeSettings(file, rest);
+    if (Object.keys(rest).length === 0) {
+      rmSync(file, { force: true });
+      if (readdirSync(path.dirname(file)).length === 0) rmdirSync(path.dirname(file));
+    } else writeSettings(file, rest);
   }
   console.log(`✓ Đã gỡ hook khỏi ${project}`);
   if (await probe()) {
@@ -107,6 +112,9 @@ async function status(project) {
   const hooks = hasOfficeHooks(loadSettings(settingsFile(project)), hookUrl(port));
   const srv = await probe();
   console.log(`Hook: ${hooks ? 'BẬT' : 'TẮT'} · Server: ${srv ? 'đang chạy' : 'tắt'} · Sự kiện đã nhận: ${srv ? srv.events : 0}`);
+  if (hooks && !srv) {
+    console.log('⚠ Hook còn bật mà server đã tắt: Claude vẫn chạy bình thường nhưng mỗi tool call hiện dòng "hook error" — chạy office on để bật lại server, hoặc office off để gỡ hook');
+  }
 }
 
 async function demo(project) {

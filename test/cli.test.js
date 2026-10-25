@@ -63,7 +63,7 @@ test('on then off installs hooks, runs the server, and restores settings', async
   assert.match(status2.stdout, /Hook: TẮT · Server: tắt/);
 });
 
-test('off removes a settings file that on had to create', async () => {
+test('off removes a settings file (and .claude folder) that on had to create', async () => {
   const port = await freePort();
   const project = tmp();
   const file = path.join(project, '.claude', 'settings.local.json');
@@ -74,6 +74,36 @@ test('off removes a settings file that on had to create', async () => {
   const off = runCli(['off', '--project', project], port, dataDir);
   assert.equal(off.status, 0, off.stdout + off.stderr);
   assert.equal(existsSync(file), false, 'settings.local.json should be gone again');
+  assert.equal(existsSync(path.dirname(file)), false, 'the .claude folder on created should be gone too');
+});
+
+test('on says hooks work at once, also in open sessions, and points subfolders to --project', async () => {
+  const port = await freePort();
+  const project = tmp();
+  const dataDir = tmp();
+  const on = runCli(['on', '--project', project], port, dataDir);
+  assert.equal(on.status, 0, on.stdout + on.stderr);
+  assert.doesNotMatch(on.stdout, /mở lại/);
+  assert.match(on.stdout, /có hiệu lực ngay/);
+  assert.match(on.stdout, /--project/);
+  runCli(['off', '--project', project], port, dataDir);
+});
+
+test('status warns when hooks are on but the server is down', async () => {
+  const port = await freePort();
+  const project = tmp();
+  const dataDir = tmp();
+  runCli(['on', '--project', project], port, dataDir);
+  const base = 'http://127.0.0.1:' + port;
+  await fetch(base + '/shutdown', { method: 'POST' });
+  for (let i = 0; i < 50; i++) {
+    try { await fetch(base + '/api/state'); } catch { break; }
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  const status = runCli(['status', '--project', project], port, dataDir);
+  assert.match(status.stdout, /Hook: BẬT · Server: tắt/);
+  assert.match(status.stdout, /⚠.*hook error/);
+  runCli(['off', '--project', project], port, dataDir);
 });
 
 test('unknown command prints usage and exits 2', () => {
