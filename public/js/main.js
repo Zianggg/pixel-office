@@ -1,6 +1,6 @@
 // Wires state (REST + SSE), the 12 fps render loop, clicks and the panel together.
 import { buildGrid } from './path.js';
-import { Actor, spriteBox } from './actors.js';
+import { Actor, pickActor } from './actors.js';
 import { loadSprites, addAgentSprite, charMeta } from './sprites.js';
 import { drawStatic, drawDynamic } from './room.js';
 import { drawOverlay, drawWhiteboardText } from './overlay.js';
@@ -140,10 +140,7 @@ function actorAt(clientX, clientY) {
   const x = ((clientX - r.left) / r.width) * W;
   const y = ((clientY - r.top) / r.height) * H;
   const T = layout.tile;
-  return [...actors.values()].reverse().find((a) => {
-    const b = spriteBox(a.px, charMeta(sprites, a.view.key, T));
-    return x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h;
-  });
+  return pickActor(actors.values(), x, y, (a) => charMeta(sprites, a.view.key, T));
 }
 
 overlay.addEventListener('click', (e) => {

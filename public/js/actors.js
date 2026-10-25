@@ -41,6 +41,14 @@ export function spriteBox(px, meta) {
   return { x: px.x - meta.anchor[0], y: px.y - meta.anchor[1], w: meta.w, h: meta.h };
 }
 
+// The actor whose drawn box holds world point (x, y); where sprites overlap, the one drawn last (lowest on screen) wins.
+export function pickActor(actors, x, y, metaFor) {
+  return [...actors].sort((a, b) => b.px.y - a.px.y).find((a) => {
+    const box = spriteBox(a.px, metaFor(a));
+    return x >= box.x && x < box.x + box.w && y >= box.y && y < box.y + box.h;
+  });
+}
+
 // Key color → agent color for the shirt, hair and pants ramps; unknown ramps keep their key colors.
 export function agentColorMap(palette, cfg) {
   const map = {};

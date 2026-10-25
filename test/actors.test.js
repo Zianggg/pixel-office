@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildGrid } from '../public/js/path.js';
-import { Actor, FRAMES, accFrame, recolor, spriteBox, agentColorMap } from '../public/js/actors.js';
+import { Actor, FRAMES, accFrame, recolor, spriteBox, agentColorMap, pickActor } from '../public/js/actors.js';
 import { charMeta } from '../public/js/sprites.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
@@ -136,4 +136,15 @@ test('charMeta falls back to a 32×64 box when no char sprite is loaded', () => 
   assert.equal(charMeta({ images: { char } }, 'x', 32), char);
   const mine = { ...char };
   assert.equal(charMeta({ images: { char, 'char:x': mine } }, 'x', 32), mine);
+});
+
+test('pickActor returns the front-most actor where two sprites overlap', () => {
+  const meta = { w: 32, h: 64, anchor: [0, 32] };
+  const front = { px: { x: 64, y: 128 }, view: { key: 'front' } };
+  const back = { px: { x: 64, y: 96 }, view: { key: 'back' } };
+  // Front was added first, so a plain reverse-insertion search would wrongly return the one behind.
+  const crowd = new Map([['front', front], ['back', back]]);
+  assert.equal(pickActor(crowd.values(), 80, 110, () => meta), front);
+  assert.equal(pickActor(crowd.values(), 80, 70, () => meta), back);
+  assert.equal(pickActor(crowd.values(), 10, 10, () => meta), undefined);
 });
