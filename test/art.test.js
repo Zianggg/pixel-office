@@ -20,6 +20,9 @@ const REQUIRED = {
   acc_tie: [16, 16, 3], acc_cap: [16, 16, 3], acc_glasses: [16, 16, 3], acc_headset: [16, 16, 3],
   acc_bow: [16, 16, 3], acc_beanie: [16, 16, 3], acc_helmet: [16, 16, 3], acc_scarf: [16, 16, 3],
   lamp: [12, 12, 5], bubble: [18, 18, 1], badge: [16, 16, 1],
+  rug: [160, 128, 1], coffeeTable: [64, 32, 1], sofa: [96, 32, 1], arcLamp: [32, 64, 1], monstera: [32, 64, 1],
+  counter: [96, 64, 1], windowWide: [96, 64, 1], fridge: [32, 96, 1], pantryTable: [64, 32, 1], pantryChair: [32, 32, 1],
+  arcade: [32, 64, 1], tvStand: [64, 64, 1], poster: [32, 32, 1], pingpong: [96, 64, 1], beanbag: [32, 32, 1],
 };
 for (const a of layout.agents) if (a.kit) REQUIRED[`kit_${a.kit}`] = [32, 32, 1];
 
@@ -144,7 +147,7 @@ test('every agent has its own desk kit', () => {
 });
 
 test('wall-hung sprites keep a transparent margin so they never touch the wall edges', () => {
-  for (const name of ['window', 'clock', 'painting', 'whiteboard']) {
+  for (const name of ['window', 'windowWide', 'clock', 'painting', 'whiteboard', 'poster']) {
     const m = manifest[name];
     const px = pixels(readPng(new URL(m.file, ART)));
     const w = m.w * (m.frames ?? 1);

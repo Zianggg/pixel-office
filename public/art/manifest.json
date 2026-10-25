@@ -48,5 +48,20 @@
   "wallGameTrim":    { "file": "wallGameTrim.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "divider":         { "file": "divider.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "doorway":         { "file": "doorway.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
-  "chair2":          { "file": "chair2.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] }
+  "chair2":          { "file": "chair2.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "rug":             { "file": "rug.png", "w": 160, "h": 128, "frames": 1, "anchor": [0, 0] },
+  "coffeeTable":     { "file": "coffeeTable.png", "w": 64, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "sofa":            { "file": "sofa.png", "w": 96, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "arcLamp":         { "file": "arcLamp.png", "w": 32, "h": 64, "frames": 1, "anchor": [0, 0] },
+  "monstera":        { "file": "monstera.png", "w": 32, "h": 64, "frames": 1, "anchor": [0, 0] },
+  "counter":         { "file": "counter.png", "w": 96, "h": 64, "frames": 1, "anchor": [0, 0] },
+  "windowWide":      { "file": "windowWide.png", "w": 96, "h": 64, "frames": 1, "anchor": [0, 0] },
+  "fridge":          { "file": "fridge.png", "w": 32, "h": 96, "frames": 1, "anchor": [0, 0] },
+  "pantryTable":     { "file": "pantryTable.png", "w": 64, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "pantryChair":     { "file": "pantryChair.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "arcade":          { "file": "arcade.png", "w": 32, "h": 64, "frames": 1, "anchor": [0, 0] },
+  "tvStand":         { "file": "tvStand.png", "w": 64, "h": 64, "frames": 1, "anchor": [0, 0] },
+  "poster":          { "file": "poster.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "pingpong":        { "file": "pingpong.png", "w": 96, "h": 64, "frames": 1, "anchor": [0, 0] },
+  "beanbag":         { "file": "beanbag.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] }
 }
