@@ -103,3 +103,10 @@ test('real Claude Code 2.1.310 permission Notification (raised by a subagent) is
   assert.equal(ev.agentId, null);
   assert.equal(ev.agentType, null);
 });
+
+test('non-string agent_type / tool_name / agent_id are dropped, not passed on', () => {
+  const ev = summarize({ ...base, hook_event_name: 'PreToolUse', agent_type: { x: 1 }, agent_id: 7, tool_name: 42, tool_input: {} });
+  assert.equal(ev.agentType, null);
+  assert.equal(ev.agentId, null);
+  assert.equal(ev.tool, null);
+});

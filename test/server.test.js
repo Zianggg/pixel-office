@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { createOfficeServer } from '../server.js';
 
@@ -115,5 +116,79 @@ test('debugRaw appends every raw hook payload to raw.jsonl; off by default', asy
     assert.equal(existsSync(path.join(quiet, 'raw.jsonl')), false);
   } finally {
     await srv2.close();
+  }
+});
+
+// Raw requests so tests can set Host / Origin (fetch forbids overriding Host).
+const raw = (port, { method = 'GET', path: p = '/api/state', headers = {}, body = '' } = {}) => new Promise((resolve, reject) => {
+  const req = http.request({ host: '127.0.0.1', port, method, path: p, headers }, (res) => {
+    res.resume();
+    res.on('end', () => resolve(res.statusCode));
+  });
+  req.on('error', reject);
+  req.end(body);
+});
+
+const readEvents = async (reader, n) => {
+  let text = '';
+  const dec = new TextDecoder();
+  while (text.split('event: event\n').length - 1 < n) text += dec.decode((await reader.read()).value);
+  return text.split('event: event\ndata: ').slice(1).map((chunk) => JSON.parse(chunk.split('\n')[0]));
+};
+
+test('C1: a real agent-less permission Notification is broadcast on the agent that is waiting', async () => {
+  const srv = await start();
+  const ac = new AbortController();
+  try {
+    const res = await fetch(`http://127.0.0.1:${srv.port}/events`, { signal: ac.signal });
+    const reader = res.body.getReader();
+    await post(srv.port, startPayload);
+    await post(srv.port, { ...startPayload, hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command: 'touch x' }, tool_use_id: 'u1' });
+    await post(srv.port, { session_id: 's', cwd: 'E:\\UnityProject', hook_event_name: 'Notification', message: 'Claude needs your permission', notification_type: 'permission_prompt' });
+    const events = await readEvents(reader, 3);
+    assert.equal(events[2].agent.key, 'unity-qa-tester');
+    assert.equal(events[2].agent.status, 'waiting');
+  } finally {
+    ac.abort();
+    await srv.close();
+  }
+});
+
+test('I1: hostile agent_type / tool_name values neither crash the server nor poison a restart', async () => {
+  const dir = tmp();
+  const srv = await start(dir);
+  try {
+    for (const agent_type of ['constructor', '__proto__', 'toString']) {
+      const res = await post(srv.port, { ...startPayload, hook_event_name: 'PreToolUse', agent_type, tool_name: 'Read', tool_input: {} });
+      assert.equal(res.status, 200);
+    }
+    assert.equal((await post(srv.port, { ...startPayload, hook_event_name: 'PreToolUse', tool_name: 42 })).status, 200);
+    assert.equal((await post(srv.port, { ...startPayload, agent_type: { x: 1 } })).status, 200);
+    assert.equal((await fetch(`http://127.0.0.1:${srv.port}/api/state`)).status, 200);
+  } finally {
+    await srv.close();
+  }
+  const again = await start(dir);
+  try {
+    assert.equal((await fetch(`http://127.0.0.1:${again.port}/api/state`)).status, 200);
+  } finally {
+    await again.close();
+  }
+});
+
+test('I2: requests with a foreign Host or a foreign Origin are refused', async () => {
+  const srv = await start();
+  try {
+    const port = srv.port;
+    assert.equal(await raw(port, { headers: { host: `127.0.0.1:${port}` } }), 200);
+    assert.equal(await raw(port, { headers: { host: `localhost:${port}` } }), 200);
+    assert.equal(await raw(port, { headers: { host: `evil.example:${port}` } }), 403);
+    assert.equal(await raw(port, { method: 'POST', path: '/shutdown', headers: { host: `127.0.0.1:${port}`, origin: 'http://evil.example' } }), 403);
+    assert.equal(await raw(port, { method: 'POST', path: '/hook', headers: { host: `127.0.0.1:${port}`, origin: 'http://evil.example', 'content-type': 'application/json' }, body: JSON.stringify(startPayload) }), 403);
+    assert.equal(await raw(port, { headers: { host: `127.0.0.1:${port}` } }), 200, 'server must still be up');
+    const state = await (await fetch(`http://127.0.0.1:${port}/api/state`)).json();
+    assert.equal(state.state.agents['unity-qa-tester'].status, 'idle', 'foreign-origin hook must not be applied');
+  } finally {
+    await srv.close();
   }
 });

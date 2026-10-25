@@ -169,3 +169,33 @@ test('a waiting notification falls back to the boss when no tool call is open', 
   assert.equal(s.agents.__main__.status, 'waiting');
   assert.equal(s.agents[QA].status, 'working');
 });
+
+test('I3: a finished tool call clears waiting back to working', () => {
+  let s = run([
+    ev({ ev: 'SubagentStart', agentId: 'a1', agentType: QA, t: 1 }),
+    ev({ agentId: 'a1', agentType: QA, tool: 'Bash', toolUseId: 'u1', t: 2 }),
+    ev({ ev: 'Notification', agentId: 'a1', agentType: QA, waiting: true, t: 3 }),
+  ]);
+  assert.equal(s.agents[QA].status, 'waiting');
+  s = run([ev({ ev: 'PostToolUse', agentId: 'a1', agentType: QA, tool: 'Bash', toolUseId: 'u1', t: 4 })], s);
+  assert.equal(s.agents[QA].status, 'working');
+});
+
+test('a long-running tool call is not idled after 10 minutes, only after 60', () => {
+  const s = run([
+    ev({ ev: 'SubagentStart', agentId: 'b1', agentType: 'unity-build-engineer', t: 0 }),
+    ev({ agentId: 'b1', agentType: 'unity-build-engineer', tool: 'Bash', toolUseId: 'u9', detail: 'Build Windows', t: 0 }),
+  ]);
+  assert.equal(tick(s, 30 * 60 * 1000).agents['unity-build-engineer'].status, 'working');
+  assert.equal(tick(s, 60 * 60 * 1000 + 1).agents['unity-build-engineer'].status, 'idle');
+});
+
+test('a Post event wakes an agent that was idled by the stale rule', () => {
+  let s = run([
+    ev({ ev: 'SubagentStart', agentId: 'a1', agentType: QA, t: 0 }),
+  ]);
+  s = tick(s, 10 * 60 * 1000 + 1);
+  assert.equal(s.agents[QA].status, 'idle');
+  s = run([ev({ ev: 'PostToolUse', agentId: 'a1', agentType: QA, tool: 'Bash', toolUseId: 'u1', t: 10 * 60 * 1000 + 2 })], s);
+  assert.equal(s.agents[QA].status, 'working');
+});

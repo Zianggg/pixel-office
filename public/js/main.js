@@ -5,6 +5,7 @@ import { loadSprites, addAgentSprite } from './sprites.js';
 import { drawStatic, drawDynamic } from './room.js';
 import { drawOverlay, drawWhiteboardText } from './overlay.js';
 import { glowSources, sunBeams, drawGlow } from './glow.js';
+import { fitScale } from './scale.js';
 import { renderTopBar, openPanel, closePanel } from './panel.js';
 
 // Room size in pixels; set from layout.json (cols × tile, rows × tile) once it loads.
@@ -96,8 +97,7 @@ function connect(attempt = 0) {
 }
 
 function resize() {
-  const avail = Math.min(window.innerWidth / W, (window.innerHeight - topbar.offsetHeight - 16) / H);
-  scale = Math.max(1, Math.floor(avail));
+  scale = fitScale(window.innerWidth, window.innerHeight - topbar.offsetHeight - 16, W, H);
   stage.style.width = `${W * scale}px`;
   stage.style.height = `${H * scale}px`;
   const dpr = window.devicePixelRatio || 1;
@@ -127,6 +127,8 @@ function frame() {
 }
 
 function startLoop() {
+  // visibilitychange can fire while the page is still loading; wait until the first state is in.
+  if (!state) return;
   if (timer === null && !document.hidden) {
     last = performance.now();
     timer = setTimeout(frame, FRAME_MS);

@@ -4,7 +4,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from 'n
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { summarize } from './lib/summarize.js';
-import { createState, keyFor, reduce, tick } from './lib/state.js';
+import { createState, reduce, resolveKey, tick } from './lib/state.js';
 import { createEventLog } from './lib/eventlog.js';
 import { hasOfficeHooks, readSettings } from './lib/hooks-config.js';
 
@@ -60,7 +60,15 @@ function serveStatic(publicDir, urlPath, res) {
 // debugRaw (OFFICE_DEBUG=1): also append each raw hook body to raw.jsonl — full payloads, for checking real hook fields only.
 export async function createOfficeServer({ dataDir, publicDir, layout, projectDir, port = 4848, now = Date.now, debugRaw = false }) {
   const log = createEventLog({ dir: dataDir });
-  let state = log.readTail(2000).reduce((s, ev) => reduce(s, ev, layout), createState(layout));
+  const safeReduce = (s, ev) => {
+    try {
+      return reduce(s, ev, layout);
+    } catch (err) {
+      console.warn(`[office] bỏ qua sự kiện lỗi: ${err.message}`);
+      return s;
+    }
+  };
+  let state = log.readTail(2000).reduce(safeReduce, createState(layout));
   state = tick(state, now());
   const clients = new Set();
   let actualPort = port;
@@ -78,7 +86,20 @@ export async function createOfficeServer({ dataDir, publicDir, layout, projectDi
     }
   };
 
+  // Only this machine's own pages and clients: blocks DNS rebinding (Host) and cross-site POSTs (Origin).
+  const ownOrigins = () => [`127.0.0.1:${actualPort}`, `localhost:${actualPort}`];
+  const allowed = (req) => {
+    if (!ownOrigins().includes(req.headers.host)) return false;
+    const origin = req.headers.origin;
+    return req.method !== 'POST' || !origin || ownOrigins().some((h) => origin === `http://${h}`);
+  };
+
   const server = http.createServer(async (req, res) => {
+    if (!allowed(req)) {
+      res.writeHead(403, { 'content-type': 'text/plain; charset=utf-8' });
+      res.end('Không được phép');
+      return;
+    }
     const url = new URL(req.url, 'http://127.0.0.1');
     if (req.method === 'POST' && url.pathname === '/hook') {
       const body = await readBody(req);
@@ -93,9 +114,14 @@ export async function createOfficeServer({ dataDir, publicDir, layout, projectDi
         console.warn('[office] payload hook không hợp lệ, bỏ qua');
       }
       if (ev) {
-        log.append(ev);
-        state = reduce(state, ev, layout);
-        broadcast('event', { ev, agent: state.agents[keyFor(ev)], totals: state.totals });
+        try {
+          const key = resolveKey(state, ev);
+          state = reduce(state, ev, layout);
+          log.append(ev);
+          broadcast('event', { ev, agent: state.agents[key], totals: state.totals });
+        } catch (err) {
+          console.warn(`[office] bỏ qua sự kiện lỗi: ${err.message}`);
+        }
       }
       return sendJson(res, 200, {});
     }
