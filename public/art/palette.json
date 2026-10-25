@@ -1,0 +1,57 @@
+{
+  "colors": {
+    "outline": "#2b1d14",
+    "floor": "#d98a4e",
+    "floorLight": "#e8a564",
+    "floorDark": "#b8693a",
+    "wall": "#8fa3b8",
+    "wallDark": "#6f8296",
+    "wallTrim": "#c9d3de",
+    "wood": "#c7915a",
+    "woodLight": "#e0b27c",
+    "woodDark": "#8a5a33",
+    "metal": "#9aa3ad",
+    "metalDark": "#5d6570",
+    "screenOff": "#1f2a33",
+    "screenOn": "#4fd16b",
+    "screenErr": "#e0473f",
+    "plant": "#4d9a3f",
+    "plantDark": "#2f6b2a",
+    "pot": "#a0522d",
+    "skin": "#f2c29b",
+    "skinShade": "#d99c76",
+    "white": "#f4f1ea",
+    "paper": "#e9e4d6",
+    "water": "#5a8fd6",
+    "mug": "#d94a3a",
+    "bookRed": "#b3423a",
+    "bookGreen": "#3f7d4a",
+    "bookBlue": "#3e5f9e",
+    "bookYellow": "#d8b04a",
+    "lampGreen": "#4fd16b",
+    "lampYellow": "#f2c94c",
+    "lampRed": "#e0473f",
+    "lampGrey": "#9aa3ad"
+  },
+  "keys": {
+    "shirt": ["#ff00ff", "#b000b0"],
+    "hair": ["#00ffff", "#00a0a0"]
+  },
+  "shirts": {
+    "red": ["#c0392b", "#8e2a20"],
+    "purple": ["#8e5cc2", "#653f91"],
+    "navy": ["#2f4f8f", "#213866"],
+    "orange": ["#e07b39", "#b25a22"],
+    "green": ["#4caf50", "#357a38"],
+    "yellow": ["#e8c547", "#b89a2c"],
+    "pink": ["#e37fa8", "#b85a82"],
+    "grey": ["#8d9399", "#62686e"],
+    "brown": ["#8b5a3c", "#64402a"]
+  },
+  "hairs": {
+    "dark": ["#3b2a20", "#261a13"],
+    "brown": ["#7a4b2a", "#55331c"],
+    "black": ["#1c1c22", "#0e0e12"],
+    "blonde": ["#e3c16f", "#b8963f"]
+  }
+}
