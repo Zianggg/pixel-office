@@ -83,8 +83,10 @@ function pixels({ w, h, depth, ctype, plte, trns, idat }) {
 const allowed = new Set(
   [
     ...Object.values(palette.colors),
+    ...Object.values(palette.legacy ?? {}),
     ...palette.keys.shirt,
     ...palette.keys.hair,
+    ...(palette.keys.pants ?? []),
   ].map((c) => c.toLowerCase()),
 );
 
@@ -151,4 +153,19 @@ test('wall-hung sprites keep a transparent margin so they never touch the wall e
       if (edge) assert.equal(px[i].alpha, 0, `${name} touches its edge at ${x},${y}`);
     }
   }
+});
+
+test("palette defines pants keys and every agent's pants ramp", () => {
+  assert.equal(palette.keys.pants?.length, 3);
+  for (const a of layout.agents) {
+    assert.ok(a.pants, `${a.type} has no pants`);
+    assert.equal(palette.pants?.[a.pants]?.length, 3, `pants ramp "${a.pants}" of ${a.type}`);
+  }
+});
+
+test('palette keeps the color names the code reads', () => {
+  for (const name of ['sun', 'sunGlow', 'screenOff', 'screenOn', 'screenErr', 'lampGreen', 'lampYellow', 'lampRed', 'lampGrey']) {
+    assert.ok(palette.colors[name], `colors.${name} missing`);
+  }
+  assert.equal(palette.colors.outline, '#3d2a22');
 });
