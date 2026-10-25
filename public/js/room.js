@@ -1,5 +1,6 @@
 // Draws the office: static background once, then per-frame desks, chairs and actors.
-import { drawSprite } from './sprites.js';
+import { drawSprite, charMeta } from './sprites.js';
+import { spriteBox } from './actors.js';
 import { monitorPos, deskKits } from './desks.js';
 
 export { deskKits };
@@ -45,7 +46,10 @@ export function drawDynamic(ctx, layout, sprites, state, actors) {
     ...layout.desks.map((d) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),
     ...[...actors.values()].map((a) => ({
       y: a.px.y,
-      draw: () => drawSprite(ctx, sprites, `char:${a.view.key}`, a.frame, a.px.x, a.px.y - T / 2, { flip: a.flip, w: T, h: T * 1.5 }),
+      draw: () => {
+        const b = spriteBox(a.px, charMeta(sprites, a.view.key, T));
+        drawSprite(ctx, sprites, `char:${a.view.key}`, a.frame, b.x, b.y, { flip: a.flip, w: b.w, h: b.h });
+      },
     })),
   ];
   items.sort((a, b) => a.y - b.y).forEach((it) => it.draw());

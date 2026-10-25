@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { glowSources, sunBeams, monitorPos, lampGlowColor } from '../public/js/glow.js';
+import { roomAt } from '../public/js/path.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
 const palette = JSON.parse(readFileSync(new URL('../public/art/palette.json', import.meta.url), 'utf8'));
@@ -10,7 +11,7 @@ const T = layout.tile;
 const k = T / 16;
 const stateWith = (agents) => ({ agents: Object.fromEntries(agents.map((a) => [a.key, a])), totals: {} });
 
-const windows = layout.props.filter((p) => p.sprite === 'window');
+const windows = layout.props.filter((p) => p.sprite.startsWith('window'));
 
 test('sunlight glows through every window, not through the door', () => {
   const suns = glowSources(layout, stateWith([]), palette, 0).filter((s) => s.kind === 'sun');
@@ -27,7 +28,8 @@ test('each window casts a short beam that starts at the floor line and widens', 
   const beams = sunBeams(layout, palette);
   assert.equal(beams.length, windows.length);
   beams.forEach((b, i) => {
-    assert.equal(b.top.y, layout.wallRows * T);
+    const r = roomAt(layout, windows[i].x, windows[i].y);
+    assert.equal(b.top.y, (r.y + r.wallRows) * T);
     assert.ok(b.bottom.y > b.top.y);
     assert.ok(b.bottom.y - b.top.y <= T, 'beam reaches too far into the room');
     assert.ok(b.top.x0 >= windows[i].x * T && b.top.x1 <= (windows[i].x + windows[i].w) * T);
@@ -36,11 +38,16 @@ test('each window casts a short beam that starts at the floor line and widens', 
   });
 });
 
+test("the pantry's wide window casts sunlight", () => {
+  const suns = glowSources(layout, stateWith([]), palette, 0).filter((s) => s.kind === 'sun');
+  assert.ok(suns.some((s) => s.x === (29 + 1.5) * T && s.y === 1 * T), 'no sun at the pantry window');
+});
+
 test('a working agent lights its monitor green', () => {
   const src = glowSources(layout, stateWith([{ key: 'a', desk: 3, status: 'working' }]), palette, 0);
   const mon = src.filter((s) => s.kind === 'monitor');
   assert.equal(mon.length, 1);
-  assert.deepEqual([mon[0].x, mon[0].y, mon[0].color], [16 * T + 8 * k, 5 * T - 10 * k + 5 * k, P.screenOn]);
+  assert.deepEqual([mon[0].x, mon[0].y, mon[0].color], [16 * T + 8 * k, 6 * T - 10 * k + 5 * k, P.screenOn]);
 });
 
 test('an erroring agent lights its monitor red; idle and done agents give no monitor glow', () => {

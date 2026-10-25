@@ -36,6 +36,22 @@ export function recolor(rgba, map) {
   return out;
 }
 
+// Drawn box of a sprite whose anchor is the offset from its standing tile's top-left corner.
+export function spriteBox(px, meta) {
+  return { x: px.x - meta.anchor[0], y: px.y - meta.anchor[1], w: meta.w, h: meta.h };
+}
+
+// Key color → agent color for the shirt, hair and pants ramps; unknown ramps keep their key colors.
+export function agentColorMap(palette, cfg) {
+  const map = {};
+  for (const [part, ramps] of [['shirt', 'shirts'], ['hair', 'hairs'], ['pants', 'pants']]) {
+    const keys = palette.keys?.[part];
+    const ramp = palette[ramps]?.[cfg[part]];
+    if (keys && ramp) keys.forEach((k, i) => (map[k] = ramp[i]));
+  }
+  return map;
+}
+
 export class Actor {
   // crowd: shared Map of every actor in the room, so idle actors spread out over the wander points.
   constructor(view, layout, grid, rand = Math.random, crowd = null) {

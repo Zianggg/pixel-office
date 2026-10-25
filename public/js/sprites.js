@@ -1,5 +1,5 @@
 // Loads art/manifest.json sprites and builds recolored per-agent characters.
-import { accFrame, recolor } from './actors.js';
+import { accFrame, recolor, agentColorMap } from './actors.js';
 
 const warned = new Set();
 
@@ -64,6 +64,11 @@ export function drawSprite(ctx, sprites, name, frame, dx, dy, { scale = 1, flip 
   ctx.restore();
 }
 
+// Size and anchor of an agent's character sprite; a 1×2-tile box when no art is loaded.
+export function charMeta(sprites, key, T) {
+  return sprites.images[`char:${key}`] ?? sprites.images.char ?? { w: T, h: 2 * T, anchor: [0, T] };
+}
+
 export function addAgentSprite(sprites, key, cfg) {
   const base = sprites.images.char;
   const pal = sprites.palette;
@@ -73,12 +78,7 @@ export function addAgentSprite(sprites, key, cfg) {
   c.height = base.canvas.height;
   const ctx = c.getContext('2d');
   const src = base.canvas.getContext('2d').getImageData(0, 0, c.width, c.height);
-  const map = {};
-  const shirt = pal.shirts[cfg.shirt];
-  const hair = pal.hairs[cfg.hair];
-  if (shirt) pal.keys.shirt.forEach((k, i) => (map[k] = shirt[i]));
-  if (hair) pal.keys.hair.forEach((k, i) => (map[k] = hair[i]));
-  ctx.putImageData(new ImageData(recolor(src.data, map), c.width, c.height), 0, 0);
+  ctx.putImageData(new ImageData(recolor(src.data, agentColorMap(pal, cfg)), c.width, c.height), 0, 0);
   const acc = cfg.acc && sprites.images[`acc_${cfg.acc}`];
   if (acc) {
     const [ax, ay] = acc.anchor ?? [4, 0];

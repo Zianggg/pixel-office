@@ -1,7 +1,7 @@
 // Wires state (REST + SSE), the 12 fps render loop, clicks and the panel together.
 import { buildGrid } from './path.js';
-import { Actor } from './actors.js';
-import { loadSprites, addAgentSprite } from './sprites.js';
+import { Actor, spriteBox } from './actors.js';
+import { loadSprites, addAgentSprite, charMeta } from './sprites.js';
 import { drawStatic, drawDynamic } from './room.js';
 import { drawOverlay, drawWhiteboardText } from './overlay.js';
 import { glowSources, sunBeams, drawGlow } from './glow.js';
@@ -37,7 +37,7 @@ function syncActors(now) {
   for (const view of Object.values(state.agents)) {
     let actor = actors.get(view.key);
     if (!actor) {
-      const cfg = layout.agents.find((a) => a.type === view.key) ?? { shirt: 'grey', hair: 'dark', acc: null };
+      const cfg = layout.agents.find((a) => a.type === view.key) ?? { shirt: 'grey', hair: 'dark', pants: 'charcoal', acc: null };
       addAgentSprite(sprites, view.key, cfg);
       actor = new Actor(view, layout, grid, Math.random, actors);
       actors.set(view.key, actor);
@@ -140,7 +140,10 @@ function actorAt(clientX, clientY) {
   const x = ((clientX - r.left) / r.width) * W;
   const y = ((clientY - r.top) / r.height) * H;
   const T = layout.tile;
-  return [...actors.values()].reverse().find((a) => x >= a.px.x && x < a.px.x + T && y >= a.px.y - T / 2 && y < a.px.y + T);
+  return [...actors.values()].reverse().find((a) => {
+    const b = spriteBox(a.px, charMeta(sprites, a.view.key, T));
+    return x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h;
+  });
 }
 
 overlay.addEventListener('click', (e) => {
