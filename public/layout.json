@@ -14,30 +14,95 @@
     { "type": "unity-build-engineer", "name": "Build", "role": "Build player", "shirt": "brown", "hair": "dark", "acc": "helmet", "desk": 8 }
   ],
   "desks": [
-    { "x": 1, "y": 3, "w": 3, "seat": [2, 4], "boss": true },
-    { "x": 6, "y": 4, "w": 2, "seat": [6, 5] },
-    { "x": 9, "y": 4, "w": 2, "seat": [9, 5] },
-    { "x": 12, "y": 4, "w": 2, "seat": [12, 5] },
-    { "x": 15, "y": 4, "w": 2, "seat": [15, 5] },
-    { "x": 6, "y": 7, "w": 2, "seat": [6, 8] },
-    { "x": 9, "y": 7, "w": 2, "seat": [9, 8] },
-    { "x": 12, "y": 7, "w": 2, "seat": [12, 8] },
-    { "x": 15, "y": 7, "w": 2, "seat": [15, 8] },
-    { "x": 1, "y": 7, "w": 2, "seat": [1, 8], "spare": true },
-    { "x": 1, "y": 9, "w": 2, "seat": [1, 10], "spare": true }
+    {
+      "x": 1,
+      "y": 3,
+      "w": 3,
+      "seat": [2, 4],
+      "boss": true
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "w": 2,
+      "seat": [6, 5]
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "w": 2,
+      "seat": [9, 5]
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "w": 2,
+      "seat": [12, 5]
+    },
+    {
+      "x": 15,
+      "y": 4,
+      "w": 2,
+      "seat": [15, 5]
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "w": 2,
+      "seat": [6, 8]
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "w": 2,
+      "seat": [9, 8]
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "w": 2,
+      "seat": [12, 8]
+    },
+    {
+      "x": 15,
+      "y": 7,
+      "w": 2,
+      "seat": [15, 8]
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "w": 2,
+      "seat": [1, 8],
+      "spare": true
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "w": 2,
+      "seat": [1, 10],
+      "spare": true
+    }
   ],
   "guest": [17, 10],
   "spawn": [9, 2],
   "props": [
-    { "sprite": "door", "x": 9, "y": 0 },
-    { "sprite": "bookshelf", "x": 6, "y": 0 },
-    { "sprite": "bookshelf", "x": 12, "y": 0 },
-    { "sprite": "clock", "x": 5, "y": 0 },
-    { "sprite": "painting", "x": 15, "y": 0 },
-    { "sprite": "whiteboard", "x": 2, "y": 0 },
-    { "sprite": "cooler", "x": 18, "y": 2 },
-    { "sprite": "plant", "x": 18, "y": 9 },
-    { "sprite": "bin", "x": 4, "y": 4 }
+    { "sprite": "door", "x": 9, "y": 0, "w": 2, "h": 2 },
+    { "sprite": "bookshelf", "x": 6, "y": 0, "w": 2, "h": 2 },
+    { "sprite": "bookshelf", "x": 12, "y": 0, "w": 2, "h": 2 },
+    { "sprite": "clock", "x": 5, "y": 0, "w": 1, "h": 1 },
+    { "sprite": "painting", "x": 15, "y": 0, "w": 2, "h": 1 },
+    { "sprite": "whiteboard", "x": 2, "y": 0, "w": 2, "h": 1 },
+    { "sprite": "cooler", "x": 18, "y": 2, "w": 1, "h": 2 },
+    { "sprite": "plant", "x": 18, "y": 9, "w": 1, "h": 2 },
+    { "sprite": "bin", "x": 4, "y": 4, "w": 1, "h": 1 }
   ],
-  "wander": [[17, 3], [8, 2], [14, 2], [17, 9], [11, 2], [4, 6]]
+  "wander": [
+    [17, 3],
+    [8, 2],
+    [14, 2],
+    [17, 9],
+    [11, 2],
+    [4, 6]
+  ]
 }
