@@ -47,5 +47,6 @@
   "wallGame":        { "file": "wallGame.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "wallGameTrim":    { "file": "wallGameTrim.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "divider":         { "file": "divider.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
-  "doorway":         { "file": "doorway.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] }
+  "doorway":         { "file": "doorway.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "chair2":          { "file": "chair2.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] }
 }
