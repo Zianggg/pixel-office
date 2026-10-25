@@ -1,0 +1,72 @@
+:root {
+  --bg: #1d1712;
+  --ink: #f4f1ea;
+  --muted: #b9a998;
+  --panel: #2b221b;
+  --line: #4a3b2f;
+  --ok: #4fd16b;
+  --bad: #e0473f;
+  --warn: #f2c94c;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.4 "Segoe UI", system-ui, sans-serif;
+}
+
+#topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.pill { padding: 2px 10px; border-radius: 999px; font-weight: 600; }
+.pill.on { background: #234d2c; color: var(--ok); }
+.pill.off { background: #4d2323; color: #ff8f86; }
+
+main { display: flex; justify-content: center; padding: 8px; }
+
+#stage { position: relative; }
+#stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#world { image-rendering: pixelated; }
+
+#panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(380px, 100vw);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.4);
+}
+#panel h2 { margin: 0; }
+#panel h3 { margin: 18px 0 6px; font-size: 14px; color: var(--muted); }
+#panel .role { margin: 2px 0 12px; color: var(--muted); }
+#panel .close {
+  position: absolute; top: 10px; right: 12px;
+  border: 0; background: none; color: var(--ink); font-size: 24px; cursor: pointer;
+}
+#panel dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+#panel dt { color: var(--muted); }
+#panel dd { margin: 0; font-weight: 600; }
+.st-working { color: var(--ok); }
+.st-waiting { color: var(--warn); }
+.st-error { color: var(--bad); }
+.log { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.log li { padding: 3px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.log li.bad { color: #ff8f86; }
+.log time { color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+.log .mark { display: inline-block; width: 1.2em; }
+#panel pre { white-space: pre-wrap; background: #1d1712; padding: 10px; border-radius: 6px; margin: 0; }
+.muted { color: var(--muted); }

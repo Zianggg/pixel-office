@@ -56,7 +56,11 @@ test('SSE pushes summarized events', async () => {
     await post(srv.port, startPayload);
     let text = '';
     while (!text.includes('event: event')) text += new TextDecoder().decode((await reader.read()).value);
-    assert.match(text, /"agentType":"unity-qa-tester"/);
+    const data = JSON.parse(text.split('event: event\ndata: ')[1].split('\n')[0]);
+    assert.equal(data.ev.agentType, 'unity-qa-tester');
+    assert.equal(data.agent.key, 'unity-qa-tester');
+    assert.equal(data.agent.status, 'working');
+    assert.equal(data.totals.started, 1);
   } finally {
     ac.abort();
     await srv.close();

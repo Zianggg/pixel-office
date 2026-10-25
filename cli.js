@@ -40,10 +40,10 @@ function portFree() {
   });
 }
 
-async function startServer(project) {
+async function startServer(project, dir = dataDir) {
   spawn(process.execPath, [path.join(here, 'server.js')], {
     detached: true, stdio: 'ignore', windowsHide: true,
-    env: { ...env, OFFICE_PORT: String(port), OFFICE_DATA: dataDir, OFFICE_PROJECT: project },
+    env: { ...env, OFFICE_PORT: String(port), OFFICE_DATA: dir, OFFICE_PROJECT: project },
   }).unref();
   for (let i = 0; i < 50; i++) {
     if (await probe()) return true;
@@ -110,7 +110,7 @@ async function demo(project) {
       console.error(`✗ Cổng ${port} đang bị chiếm.`);
       process.exit(1);
     }
-    if (!(await startServer(project))) {
+    if (!(await startServer(project, path.join(dataDir, 'demo')))) {
       console.error('✗ Server không khởi động được.');
       process.exit(1);
     }

@@ -45,6 +45,7 @@ test('parallel instances are counted and only the last stop finishes', () => {
   const stop = (id) => ev({ ev: 'SubagentStop', agentId: id, agentType: QA, t: 2000, finalReport: 'Đã test xong' });
   let s = run([start('a1'), start('a2')]);
   assert.equal(s.agents[QA].instances, 2);
+  assert.equal(s.totals.started, 1);
   s = run([stop('a1')], s);
   assert.equal(s.agents[QA].status, 'working');
   assert.equal(s.agents[QA].instances, 1);

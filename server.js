@@ -4,7 +4,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { summarize } from './lib/summarize.js';
-import { createState, reduce, tick } from './lib/state.js';
+import { createState, keyFor, reduce, tick } from './lib/state.js';
 import { createEventLog } from './lib/eventlog.js';
 import { hasOfficeHooks, readSettings } from './lib/hooks-config.js';
 
@@ -90,7 +90,7 @@ export async function createOfficeServer({ dataDir, publicDir, layout, projectDi
       if (ev) {
         log.append(ev);
         state = reduce(state, ev, layout);
-        broadcast('event', ev);
+        broadcast('event', { ev, agent: state.agents[keyFor(ev)], totals: state.totals });
       }
       return sendJson(res, 200, {});
     }
