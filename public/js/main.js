@@ -97,7 +97,7 @@ function connect(attempt = 0) {
 }
 
 function resize() {
-  scale = fitScale(window.innerWidth, window.innerHeight - topbar.offsetHeight - 16, W, H);
+  scale = fitScale(window.innerWidth - 16, window.innerHeight - topbar.offsetHeight - 16, W, H);
   stage.style.width = `${W * scale}px`;
   stage.style.height = `${H * scale}px`;
   const dpr = window.devicePixelRatio || 1;

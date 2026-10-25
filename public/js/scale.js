@@ -1,4 +1,5 @@
-// Display scale for the room: as large as fits, in 0.5 steps, never below 1.
+// Display scale for the room: as large as fits, in 0.5 steps; a window too small for x1 shrinks it exactly to fit.
 export function fitScale(availW, availH, W, H) {
-  return Math.max(1, Math.floor(Math.min(availW / W, availH / H) * 2) / 2);
+  const fit = Math.min(availW / W, availH / H);
+  return fit < 1 ? fit : Math.floor(fit * 2) / 2;
 }

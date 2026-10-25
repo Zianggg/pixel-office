@@ -88,7 +88,6 @@ function pixels({ w, h, depth, ctype, plte, trns, idat }) {
 const allowed = new Set(
   [
     ...Object.values(palette.colors),
-    ...Object.values(palette.legacy ?? {}),
     ...palette.keys.shirt,
     ...palette.keys.hair,
     ...(palette.keys.pants ?? []),
@@ -180,4 +179,8 @@ test('floor and wall tiles have no transparent pixels', () => {
     const holes = pixels(readPng(new URL(manifest[name].file, ART))).filter((p) => p.alpha !== 255).length;
     assert.equal(holes, 0, `${name} has ${holes} transparent pixels`);
   }
+});
+
+test('no legacy palette remains', () => {
+  assert.equal(palette.legacy, undefined);
 });
