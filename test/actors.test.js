@@ -2,10 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildGrid } from '../public/js/path.js';
-import { Actor, FRAMES, recolor } from '../public/js/actors.js';
+import { Actor, FRAMES, accFrame, recolor } from '../public/js/actors.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
 const grid = buildGrid(layout);
+const T = layout.tile;
 const view = (o) => ({ key: 'unity-qa-tester', desk: 6, status: 'idle', instances: 0, ...o });
 const runFor = (actor, ms, step = 50) => { for (let t = 0; t < ms; t += step) actor.update(step, () => 0.5); };
 
@@ -20,7 +21,7 @@ test('recolor swaps key colors and keeps alpha and other pixels', () => {
 
 test('a new actor stands at the spawn tile', () => {
   const a = new Actor(view(), layout, grid);
-  assert.deepEqual(a.px, { x: layout.spawn[0] * 16, y: layout.spawn[1] * 16 });
+  assert.deepEqual(a.px, { x: layout.spawn[0] * T, y: layout.spawn[1] * T });
   assert.equal(a.frame, FRAMES.down);
 });
 
@@ -29,7 +30,7 @@ test('working actor walks to its seat and types', () => {
   a.sync(view({ status: 'working' }), 0);
   runFor(a, 20000);
   const [sx, sy] = layout.desks[6].seat;
-  assert.deepEqual(a.px, { x: sx * 16, y: sy * 16 });
+  assert.deepEqual(a.px, { x: sx * T, y: sy * T });
   assert.ok([FRAMES.type1, FRAMES.type2].includes(a.frame));
   const seen = new Set();
   for (let i = 0; i < 8; i++) { a.update(125); seen.add(a.frame); }
@@ -47,13 +48,13 @@ test('actor without a desk goes to the guest spot', () => {
   const a = new Actor(view({ desk: -1 }), layout, grid);
   a.sync(view({ desk: -1, status: 'working' }), 0);
   runFor(a, 20000);
-  assert.deepEqual(a.px, { x: layout.guest[0] * 16, y: layout.guest[1] * 16 });
+  assert.deepEqual(a.px, { x: layout.guest[0] * T, y: layout.guest[1] * T });
 });
 
 test('idle actor wanders to a wander point', () => {
   const a = new Actor(view(), layout, grid);
   runFor(a, 30000);
-  const tiles = layout.wander.map(([x, y]) => `${x * 16},${y * 16}`);
+  const tiles = layout.wander.map(([x, y]) => `${x * T},${y * T}`);
   assert.ok(tiles.includes(`${a.px.x},${a.px.y}`), `at ${a.px.x},${a.px.y}`);
 });
 
@@ -64,7 +65,7 @@ test('switching to work mid-walk still ends on the seat', () => {
   a.sync(view({ status: 'working' }), 0);
   runFor(a, 20000);
   const [sx, sy] = layout.desks[6].seat;
-  assert.deepEqual(a.px, { x: sx * 16, y: sy * 16 });
+  assert.deepEqual(a.px, { x: sx * T, y: sy * T });
 });
 
 test('finished actor leaves the seat and wanders again', () => {
@@ -74,7 +75,7 @@ test('finished actor leaves the seat and wanders again', () => {
   a.sync(view({ status: 'done' }), 0);
   runFor(a, 30000);
   const [sx, sy] = layout.desks[6].seat;
-  assert.notDeepEqual(a.px, { x: sx * 16, y: sy * 16 });
+  assert.notDeepEqual(a.px, { x: sx * T, y: sy * T });
   assert.equal(a.frame === FRAMES.type1 || a.frame === FRAMES.type2, false);
 });
 
@@ -87,4 +88,14 @@ test('walking left flips the side frames', () => {
     if (a.flip && [FRAMES.walkSide1, FRAMES.walkSide2].includes(a.frame)) flipped = true;
   }
   assert.ok(flipped);
+});
+
+test('accFrame picks the accessory view (front/back/side) for each character frame', () => {
+  const want = { down: 0, walkDown1: 0, walkDown2: 0, up: 1, type1: 1, type2: 1, walkSide1: 2, walkSide2: 2 };
+  for (const [name, f] of Object.entries(want)) assert.equal(accFrame(FRAMES[name], 3), f, name);
+});
+
+test('accFrame falls back to frame 0 for single-frame accessories', () => {
+  assert.equal(accFrame(FRAMES.up, 1), 0);
+  assert.equal(accFrame(FRAMES.walkSide1, 1), 0);
 });

@@ -1,108 +1,47 @@
 {
-  "cols": 20,
-  "rows": 11,
-  "tile": 16,
+  "cols": 26,
+  "rows": 16,
+  "tile": 32,
+  "wallRows": 3,
   "agents": [
-    { "type": "__main__", "name": "Trưởng phòng", "role": "Điều phối pipeline", "shirt": "red", "hair": "dark", "acc": "tie", "desk": 0 },
-    { "type": "unity-game-designer", "name": "Thiết kế", "role": "Viết GDD", "shirt": "purple", "hair": "brown", "acc": "bow", "desk": 1 },
-    { "type": "unity-tech-architect", "name": "Kiến trúc sư", "role": "Kiến trúc + backlog", "shirt": "navy", "hair": "black", "acc": "glasses", "desk": 2 },
-    { "type": "unity-project-setup", "name": "Setup", "role": "Tạo project, package, git", "shirt": "orange", "hair": "blonde", "acc": "cap", "desk": 3 },
-    { "type": "unity-gameplay-programmer", "name": "Lập trình", "role": "C# gameplay + test", "shirt": "green", "hair": "dark", "acc": "headset", "desk": 4 },
-    { "type": "unity-scene-builder", "name": "Dựng cảnh", "role": "Scene, prefab, UI", "shirt": "yellow", "hair": "brown", "acc": "beanie", "desk": 5 },
-    { "type": "unity-qa-tester", "name": "QA", "role": "Test + báo cáo QA", "shirt": "pink", "hair": "black", "acc": "scarf", "desk": 6 },
-    { "type": "unity-code-reviewer", "name": "Review", "role": "Review C#", "shirt": "grey", "hair": "blonde", "acc": null, "desk": 7 },
-    { "type": "unity-build-engineer", "name": "Build", "role": "Build player", "shirt": "brown", "hair": "dark", "acc": "helmet", "desk": 8 }
+    { "type": "__main__", "name": "Trưởng phòng", "role": "Điều phối pipeline", "shirt": "red", "hair": "dark", "acc": "tie", "desk": 0, "kit": "boss" },
+    { "type": "unity-game-designer", "name": "Thiết kế", "role": "Viết GDD", "shirt": "purple", "hair": "brown", "acc": "bow", "desk": 1, "kit": "design" },
+    { "type": "unity-tech-architect", "name": "Kiến trúc sư", "role": "Kiến trúc + backlog", "shirt": "navy", "hair": "black", "acc": "glasses", "desk": 2, "kit": "architect" },
+    { "type": "unity-project-setup", "name": "Setup", "role": "Tạo project, package, git", "shirt": "orange", "hair": "blonde", "acc": "cap", "desk": 3, "kit": "setup" },
+    { "type": "unity-gameplay-programmer", "name": "Lập trình", "role": "C# gameplay + test", "shirt": "green", "hair": "dark", "acc": "headset", "desk": 4, "kit": "code" },
+    { "type": "unity-scene-builder", "name": "Dựng cảnh", "role": "Scene, prefab, UI", "shirt": "yellow", "hair": "brown", "acc": "beanie", "desk": 5, "kit": "scene" },
+    { "type": "unity-qa-tester", "name": "QA", "role": "Test + báo cáo QA", "shirt": "pink", "hair": "black", "acc": "scarf", "desk": 6, "kit": "qa" },
+    { "type": "unity-code-reviewer", "name": "Review", "role": "Review C#", "shirt": "grey", "hair": "blonde", "acc": null, "desk": 7, "kit": "review" },
+    { "type": "unity-build-engineer", "name": "Build", "role": "Build player", "shirt": "brown", "hair": "dark", "acc": "helmet", "desk": 8, "kit": "build" }
   ],
   "desks": [
-    {
-      "x": 1,
-      "y": 3,
-      "w": 3,
-      "seat": [2, 4],
-      "boss": true
-    },
-    {
-      "x": 6,
-      "y": 4,
-      "w": 2,
-      "seat": [6, 5]
-    },
-    {
-      "x": 9,
-      "y": 4,
-      "w": 2,
-      "seat": [9, 5]
-    },
-    {
-      "x": 12,
-      "y": 4,
-      "w": 2,
-      "seat": [12, 5]
-    },
-    {
-      "x": 15,
-      "y": 4,
-      "w": 2,
-      "seat": [15, 5]
-    },
-    {
-      "x": 6,
-      "y": 7,
-      "w": 2,
-      "seat": [6, 8]
-    },
-    {
-      "x": 9,
-      "y": 7,
-      "w": 2,
-      "seat": [9, 8]
-    },
-    {
-      "x": 12,
-      "y": 7,
-      "w": 2,
-      "seat": [12, 8]
-    },
-    {
-      "x": 15,
-      "y": 7,
-      "w": 2,
-      "seat": [15, 8]
-    },
-    {
-      "x": 1,
-      "y": 7,
-      "w": 2,
-      "seat": [1, 8],
-      "spare": true
-    },
-    {
-      "x": 1,
-      "y": 9,
-      "w": 2,
-      "seat": [1, 10],
-      "spare": true
-    }
+    {"x":2,"y":5,"w":3,"seat":[3,6],"boss":true},
+    {"x":8,"y":5,"w":2,"seat":[8,6]},
+    {"x":12,"y":5,"w":2,"seat":[12,6]},
+    {"x":16,"y":5,"w":2,"seat":[16,6]},
+    {"x":20,"y":5,"w":2,"seat":[20,6]},
+    {"x":8,"y":10,"w":2,"seat":[8,11]},
+    {"x":12,"y":10,"w":2,"seat":[12,11]},
+    {"x":16,"y":10,"w":2,"seat":[16,11]},
+    {"x":20,"y":10,"w":2,"seat":[20,11]},
+    {"x":2,"y":10,"w":2,"seat":[2,11],"spare":true},
+    {"x":2,"y":13,"w":2,"seat":[2,14],"spare":true}
   ],
-  "guest": [17, 10],
-  "spawn": [9, 2],
+  "guest": [21,13],
+  "spawn": [12,3],
   "props": [
-    { "sprite": "door", "x": 9, "y": 0, "w": 2, "h": 2 },
-    { "sprite": "bookshelf", "x": 6, "y": 0, "w": 2, "h": 2 },
-    { "sprite": "bookshelf", "x": 12, "y": 0, "w": 2, "h": 2 },
-    { "sprite": "clock", "x": 5, "y": 0, "w": 1, "h": 1 },
-    { "sprite": "painting", "x": 15, "y": 0, "w": 2, "h": 1 },
-    { "sprite": "whiteboard", "x": 2, "y": 0, "w": 2, "h": 1 },
-    { "sprite": "cooler", "x": 18, "y": 2, "w": 1, "h": 2 },
-    { "sprite": "plant", "x": 18, "y": 9, "w": 1, "h": 2 },
-    { "sprite": "bin", "x": 4, "y": 4, "w": 1, "h": 1 }
+    {"sprite":"whiteboard","x":1,"y":1,"w":2,"h":1},
+    {"sprite":"window","x":4,"y":0,"w":2,"h":2},
+    {"sprite":"clock","x":7,"y":1,"w":1,"h":1},
+    {"sprite":"bookshelf","x":9,"y":1,"w":2,"h":2},
+    {"sprite":"door","x":12,"y":0,"w":2,"h":3},
+    {"sprite":"bookshelf","x":15,"y":1,"w":2,"h":2},
+    {"sprite":"painting","x":18,"y":1,"w":2,"h":1},
+    {"sprite":"window","x":21,"y":0,"w":2,"h":2},
+    {"sprite":"cooler","x":23,"y":4,"w":1,"h":2},
+    {"sprite":"plant","x":23,"y":13,"w":1,"h":2},
+    {"sprite":"plant","x":5,"y":13,"w":1,"h":2},
+    {"sprite":"bin","x":6,"y":6,"w":1,"h":1}
   ],
-  "wander": [
-    [17, 3],
-    [8, 2],
-    [14, 2],
-    [17, 9],
-    [11, 2],
-    [4, 6]
-  ]
+  "wander": [[22,5],[10,3],[16,3],[22,14],[14,13],[7,8],[18,8],[5,3]]
 }

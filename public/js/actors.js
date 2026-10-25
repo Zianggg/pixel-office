@@ -3,7 +3,14 @@ import { findPath } from './path.js';
 
 export const FRAMES = { down: 0, up: 1, walkDown1: 2, walkDown2: 3, walkSide1: 4, walkSide2: 5, type1: 6, type2: 7 };
 
-const TILE = 16;
+// Accessory sheets hold 3 views: 0 front, 1 back, 2 side — indexed by character frame.
+const ACC_VIEW = [0, 1, 0, 0, 2, 2, 1, 1];
+
+export function accFrame(charFrame, accFrames) {
+  const view = ACC_VIEW[charFrame] ?? 0;
+  return view < accFrames ? view : 0;
+}
+
 const SPEED = 2 / 1000; // tiles per ms
 const STEP_ANIM_MS = 200;
 const TYPE_ANIM_MS = 250;
@@ -133,6 +140,7 @@ export class Actor {
   }
 
   get px() {
-    return { x: Math.round(this.x * TILE), y: Math.round(this.y * TILE) };
+    const T = this.layout.tile;
+    return { x: Math.round(this.x * T), y: Math.round(this.y * T) };
   }
 }

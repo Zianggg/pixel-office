@@ -1,10 +1,9 @@
 // Walkable grid and BFS pathfinding over office tiles. No DOM.
 
-const WALL_ROWS = 2;
-
 export function buildGrid(layout) {
+  const wallRows = layout.wallRows ?? 2;
   const grid = Array.from({ length: layout.rows }, (_, y) =>
-    Array.from({ length: layout.cols }, () => y >= WALL_ROWS));
+    Array.from({ length: layout.cols }, () => y >= wallRows));
   const block = (x, y) => {
     if (y >= 0 && y < layout.rows && x >= 0 && x < layout.cols) grid[y][x] = false;
   };

@@ -4,10 +4,12 @@ import { Actor } from './actors.js';
 import { loadSprites, addAgentSprite } from './sprites.js';
 import { drawStatic, drawDynamic } from './room.js';
 import { drawOverlay, drawWhiteboardText } from './overlay.js';
+import { glowSources, sunBeams, drawGlow } from './glow.js';
 import { renderTopBar, openPanel, closePanel } from './panel.js';
 
-const W = 320;
-const H = 180;
+// Room size in pixels; set from layout.json (cols × tile, rows × tile) once it loads.
+let W = 320;
+let H = 180;
 const FRAME_MS = 1000 / 12;
 const BACKOFF = [1000, 2000, 4000, 8000, 10000];
 
@@ -29,8 +31,6 @@ let scale = 1;
 const actors = new Map();
 const bubbles = new Map();
 const background = document.createElement('canvas');
-background.width = W;
-background.height = H;
 
 function syncActors(now) {
   for (const view of Object.values(state.agents)) {
@@ -118,9 +118,11 @@ function frame() {
   wctx.imageSmoothingEnabled = false;
   wctx.drawImage(background, 0, 0);
   drawDynamic(wctx, layout, sprites, state, actors);
+  if (sprites.palette) drawGlow(wctx, glowSources(layout, state, sprites.palette, t), sunBeams(layout, sprites.palette), t);
   const s = scale * (window.devicePixelRatio || 1);
-  drawOverlay(octx, s, actors, state, now, sprites, bubbles);
-  drawWhiteboardText(octx, s, layout, state.totals);
+  const k = layout.tile / 16;
+  drawOverlay(octx, s, actors, state, now, sprites, bubbles, k);
+  drawWhiteboardText(octx, s, layout, state.totals, k);
   timer = setTimeout(frame, FRAME_MS);
 }
 
@@ -135,7 +137,8 @@ function actorAt(clientX, clientY) {
   const r = overlay.getBoundingClientRect();
   const x = ((clientX - r.left) / r.width) * W;
   const y = ((clientY - r.top) / r.height) * H;
-  return [...actors.values()].reverse().find((a) => x >= a.px.x && x < a.px.x + 16 && y >= a.px.y - 8 && y < a.px.y + 16);
+  const T = layout.tile;
+  return [...actors.values()].reverse().find((a) => x >= a.px.x && x < a.px.x + T && y >= a.px.y - T / 2 && y < a.px.y + T);
 }
 
 overlay.addEventListener('click', (e) => {
@@ -167,6 +170,10 @@ if (!initial) {
   topbar.textContent = 'Không kết nối được server văn phòng — chạy "office on" rồi tải lại trang.';
 } else {
   layout = initial.layout;
+  W = layout.cols * layout.tile;
+  H = layout.rows * layout.tile;
+  world.width = background.width = W;
+  world.height = background.height = H;
   grid = buildGrid(layout);
   sprites = await loadSprites('art/');
   drawStatic(background.getContext('2d'), layout, sprites);

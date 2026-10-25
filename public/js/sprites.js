@@ -1,5 +1,5 @@
 // Loads art/manifest.json sprites and builds recolored per-agent characters.
-import { recolor } from './actors.js';
+import { accFrame, recolor } from './actors.js';
 
 const warned = new Set();
 
@@ -82,7 +82,10 @@ export function addAgentSprite(sprites, key, cfg) {
   const acc = cfg.acc && sprites.images[`acc_${cfg.acc}`];
   if (acc) {
     const [ax, ay] = acc.anchor ?? [4, 0];
-    for (let f = 0; f < base.frames; f++) ctx.drawImage(acc.canvas, 0, 0, acc.w, acc.h, f * base.w + ax, ay, acc.w, acc.h);
+    for (let f = 0; f < base.frames; f++) {
+      const af = accFrame(f, acc.frames);
+      ctx.drawImage(acc.canvas, af * acc.w, 0, acc.w, acc.h, f * base.w + ax, ay, acc.w, acc.h);
+    }
   }
   sprites.images[`char:${key}`] = { ...base, canvas: c };
 }

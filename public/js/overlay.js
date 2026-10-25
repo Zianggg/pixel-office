@@ -1,5 +1,6 @@
 // High-resolution overlay: status lamps, tool badges, name tags and speech bubbles.
 import { drawSprite } from './sprites.js';
+import { lampGlowColor } from './glow.js';
 
 const BUBBLE_MS = 8000;
 const BUBBLE_STATUSES = new Set(['working', 'waiting', 'error', 'done']);
@@ -84,41 +85,56 @@ function drawPill(ctx, s, x, y, text, bg) {
   ctx.textAlign = 'left';
 }
 
-export function drawOverlay(ctx, s, actors, state, now, sprites, bubbles) {
+function drawLampGlow(ctx, x, y, r, color) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, `${color}aa`);
+  g.addColorStop(1, `${color}00`);
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = g;
+  ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  ctx.restore();
+}
+
+export function drawOverlay(ctx, s, actors, state, now, sprites, bubbles, k = 1) {
+  const u = s * k;
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.imageSmoothingEnabled = false;
   const sorted = [...actors.values()].sort((a, b) => a.px.y - b.px.y);
   for (const actor of sorted) {
     const view = state.agents[actor.view.key];
     if (!view) continue;
-    const cx = (actor.px.x + 8) * s;
-    const head = (actor.px.y - 8) * s;
-    drawSprite(ctx, sprites, 'lamp', LAMP[view.status] ?? 3, cx - 3 * s, head - 7 * s, { scale: s, w: 6, h: 6 });
-    if (view.toolCount > 0) drawPill(ctx, s, cx + 4 * s, head - 3 * s, String(view.toolCount), '#e0473f');
-    if (view.instances > 1) drawPill(ctx, s, cx - 11 * s, head - 3 * s, `×${view.instances}`, '#3e5f9e');
-    ctx.font = `bold ${Math.max(10, Math.round(2.5 * s))}px "Segoe UI", sans-serif`;
+    const cx = (actor.px.x + 8 * k) * s;
+    const head = (actor.px.y - 8 * k) * s;
+    const glow = sprites.palette && lampGlowColor(view.status, sprites.palette);
+    if (glow) drawLampGlow(ctx, cx, head - 4 * u, 7 * u, glow);
+    drawSprite(ctx, sprites, 'lamp', LAMP[view.status] ?? 3, cx - 3 * u, head - 7 * u, { scale: s, w: 6 * k, h: 6 * k });
+    if (view.toolCount > 0) drawPill(ctx, u, cx + 4 * u, head - 3 * u, String(view.toolCount), '#e0473f');
+    if (view.instances > 1) drawPill(ctx, u, cx - 11 * u, head - 3 * u, `×${view.instances}`, '#3e5f9e');
+    ctx.font = `bold ${Math.max(10, Math.round(2.5 * u))}px "Segoe UI", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.lineWidth = Math.max(2, s / 1.5);
+    ctx.lineWidth = Math.max(2, u / 1.5);
     ctx.strokeStyle = 'rgba(43,29,20,0.85)';
-    ctx.strokeText(view.name, cx, (actor.px.y + 16) * s);
+    ctx.strokeText(view.name, cx, (actor.px.y + 16 * k) * s);
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(view.name, cx, (actor.px.y + 16) * s);
+    ctx.fillText(view.name, cx, (actor.px.y + 16 * k) * s);
     ctx.textAlign = 'left';
     const b = bubbles.get(view.key);
     if (b && BUBBLE_STATUSES.has(view.status) && now - b.since < BUBBLE_MS && b.text) {
-      drawBubble(ctx, s, cx, head - 8 * s, b.text, view.status);
+      drawBubble(ctx, u, cx, head - 8 * u, b.text, view.status);
     }
   }
 }
 
-export function drawWhiteboardText(ctx, s, layout, totals) {
+export function drawWhiteboardText(ctx, s, layout, totals, k = 1) {
+  const T = layout.tile;
   const wb = layout.props.find((p) => p.sprite === 'whiteboard');
   if (!wb) return;
-  ctx.font = `bold ${Math.max(10, Math.round(2.6 * s))}px "Segoe UI", sans-serif`;
+  ctx.font = `bold ${Math.max(10, Math.round(2.6 * s * k))}px "Segoe UI", sans-serif`;
   ctx.fillStyle = '#2b1d14';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`Kết quả ${totals.done}/${totals.started}`, (wb.x * 16 + wb.w * 8) * s, (wb.y * 16 + 8) * s);
+  ctx.fillText(`Kết quả ${totals.done}/${totals.started}`, (wb.x + wb.w / 2) * T * s, (wb.y + 0.5) * T * s);
   ctx.textAlign = 'left';
 }

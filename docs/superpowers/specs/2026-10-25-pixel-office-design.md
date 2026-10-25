@@ -120,16 +120,20 @@ Tải trang → `GET /api/state` → mở SSE `/events`. SSE rớt → tự kế
 ## 7. Giao diện
 
 ### 7.1 Khung
-- Canvas gốc **320×180**, lưới **20×11 ô 16 px**, phóng nguyên lần (×4 → 1280×720, tự co ×2/×3 theo cửa sổ), `imageSmoothingEnabled = false`.
+- Canvas gốc **832×512**, lưới **26×16 ô 32 px**, tường cao 3 hàng ô (kích thước lấy từ `layout.json`: `cols×tile`, `rows×tile`, `wallRows`), phóng nguyên lần theo cửa sổ (×1 ở 1280×720, ×2 ở 1920×1080), `imageSmoothingEnabled = false`. *(Đổi từ 320×180 / 20×11 / ô 16 px theo yêu cầu người dùng 2026-10-25: phòng rộng, tường cao, sprite to và chi tiết hơn.)*
 - Thanh trên cùng (HTML): Hook BẬT/TẮT · Kết nối · Tổng tool call · Số agent đang làm.
 
 ### 7.2 Bố cục phòng (một văn phòng mở)
-- Tường trên (2 hàng ô) xanh xám có viền; cửa ra vào ở giữa; đồng hồ, tranh, bảng trắng **"Kết quả: xong/tổng"**.
+- Tường trên (3 hàng ô) xanh xám, ốp gỗ phần dưới; cửa ra vào ở giữa; **2 cửa sổ nhỏ** treo giữa tường, nắng hắt ngắn xuống sàn sát chân tường; đồng hồ, tranh, bảng trắng **"Kết quả: xong/tổng"**.
 - Hai tủ sách hai bên cửa, máy nước góc phải, cây cảnh góc dưới phải, thùng rác cạnh bàn.
 - **Bàn Trưởng phòng** (to hơn) góc trái; 8 bàn nhân viên xếp 2 hàng × 4 giữa phòng; còn 2 bàn trống dự phòng cho agent lạ.
+- **Bàn cá nhân hoá**: mỗi agent có bộ đồ riêng trên bàn (`kit` trong `layout.json`, sprite `kit_*`); bàn dự phòng giữ case máy.
+- Đồ treo tường cách mép tường; đồ đặt sàn cách chân tường ≥ 1 hàng và cách mép phòng ≥ 1 ô (cửa và tủ sách đứng sát chân tường).
+- Bàn ghế **không chạm mép phòng** (cách tường trái/phải ≥ 2 ô, cách tường sau ≥ 1 hàng, ghế cách mép dưới ≥ 1 hàng) và không chạm nhau.
+- **Ánh sáng** (vẽ lúc chạy, không nướng vào PNG): nắng qua cửa sổ, màn hình phát sáng theo trạng thái (xanh làm / đỏ lỗi), đèn LED case máy, quầng sáng quanh đèn trạng thái.
 
 ### 7.3 Nhân vật
-- Sprite **16×24**, MCP chỉ vẽ **một nhân vật gốc** với các khung: đứng (xuống/lên), đi (2 khung × hướng, trái = lật phải), ngồi gõ phím (2 khung, nhìn từ sau).
+- Sprite **32×48** (ô 32 px), MCP chỉ vẽ **một nhân vật gốc** với các khung: đứng (xuống/lên), đi (2 khung × hướng, trái = lật phải), ngồi gõ phím (2 khung, nhìn từ sau).
 - Mỗi agent khác nhau nhờ **đổi màu palette lúc chạy** (màu áo, màu tóc) + một phụ kiện nhỏ (mũ, kính, tai nghe…) vẽ riêng 8×8.
 - Trên đầu: **đèn trạng thái** (xanh làm · vàng chờ · đỏ lỗi · xám rảnh · ✓ xong), **huy hiệu số** tool call, **bong bóng thoại** (9-slice, chữ pixel, tự xuống dòng, tối đa ~28 ký tự × 2 dòng).
 - Màn hình trên bàn: tắt (rảnh) · chữ xanh chạy (làm) · đỏ (lỗi).
