@@ -16,7 +16,7 @@ const REQUIRED = {
   door: [64, 96, 1], window: [64, 64, 1], desk: [64, 32, 1], deskBoss: [96, 32, 1], chair: [32, 32, 1], chair2: [32, 32, 1],
   monitor: [32, 32, 3], pc: [32, 32, 1], keyboard: [32, 16, 1], bookshelf: [64, 64, 1],
   cooler: [32, 64, 1], plant: [32, 64, 1], clock: [32, 32, 1], painting: [64, 32, 1],
-  whiteboard: [64, 32, 1], bin: [32, 32, 1], mug: [16, 16, 1], char: [32, 48, 8],
+  whiteboard: [64, 32, 1], bin: [32, 32, 1], mug: [16, 16, 1], char: [32, 64, 8],
   acc_tie: [16, 16, 3], acc_cap: [16, 16, 3], acc_glasses: [16, 16, 3], acc_headset: [16, 16, 3],
   acc_bow: [16, 16, 3], acc_beanie: [16, 16, 3], acc_helmet: [16, 16, 3], acc_scarf: [16, 16, 3],
   lamp: [12, 12, 5], bubble: [18, 18, 1], badge: [16, 16, 1],
@@ -123,9 +123,9 @@ test('sprites use only palette colors, fully opaque or fully transparent', () =>
   }
 });
 
-test('char uses the shirt and hair key colors so it can be recolored', () => {
+test('char uses the shirt, hair and pants key colors so it can be recolored', () => {
   const colors = new Set(pixels(readPng(new URL(manifest.char.file, ART))).filter((p) => p.alpha).map((p) => p.color));
-  for (const k of [...palette.keys.shirt, ...palette.keys.hair]) assert.ok(colors.has(k.toLowerCase()), `char lacks key ${k}`);
+  for (const k of [...palette.keys.shirt, ...palette.keys.hair, ...palette.keys.pants]) assert.ok(colors.has(k.toLowerCase()), `char lacks key ${k}`);
 });
 
 test('prop sprites match their tile footprints in layout.json', () => {

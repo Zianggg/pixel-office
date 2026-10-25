@@ -56,7 +56,7 @@
     const agents = document.getElementById('agents');
     for (const a of layout.agents) {
       addAgentSprite(sprites, a.type, a);
-      agents.append(tile(`char:${a.type}`, 8, 32, 48, `${a.name} · áo ${a.shirt} · tóc ${a.hair} · ${a.acc ?? 'không phụ kiện'}`));
+      agents.append(tile(`char:${a.type}`, 8, 32, 64, `${a.name} · áo ${a.shirt} · tóc ${a.hair} · quần ${a.pants} · ${a.acc ?? 'không phụ kiện'}`));
     }
   </script>
 </body>
