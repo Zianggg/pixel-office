@@ -99,3 +99,12 @@ test('accFrame falls back to frame 0 for single-frame accessories', () => {
   assert.equal(accFrame(FRAMES.up, 1), 0);
   assert.equal(accFrame(FRAMES.walkSide1, 1), 0);
 });
+
+test('idle actors sharing a room never pick the same wander point', () => {
+  const crowd = new Map();
+  const keys = ['a', 'b', 'c', 'd'];
+  for (const key of keys) crowd.set(key, new Actor(view({ key }), layout, grid, () => 0.5, crowd));
+  for (let t = 0; t < 30000; t += 50) for (const a of crowd.values()) a.update(50);
+  const spots = [...crowd.values()].map((a) => `${a.px.x},${a.px.y}`);
+  assert.equal(new Set(spots).size, spots.length, `stacked: ${spots.join(' ')}`);
+});

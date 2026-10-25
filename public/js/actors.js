@@ -37,7 +37,9 @@ export function recolor(rgba, map) {
 }
 
 export class Actor {
-  constructor(view, layout, grid, rand = Math.random) {
+  // crowd: shared Map of every actor in the room, so idle actors spread out over the wander points.
+  constructor(view, layout, grid, rand = Math.random, crowd = null) {
+    this.crowd = crowd;
     this.layout = layout;
     this.grid = grid;
     this.rand = rand;
@@ -71,6 +73,17 @@ export class Actor {
     const headingToSpot = this.target && this.target[0] === spot[0] && this.target[1] === spot[1];
     if (WORK.has(view.status) && !headingToSpot) this.goTo(spot);
     if (!WORK.has(view.status) && headingToSpot) this.target = null;
+  }
+
+  freeWanderPoints() {
+    const taken = new Set();
+    for (const other of this.crowd?.values() ?? []) {
+      if (other === this) continue;
+      if (other.target) taken.add(`${other.target[0]},${other.target[1]}`);
+      taken.add(`${Math.round(other.x)},${Math.round(other.y)}`);
+    }
+    const free = this.layout.wander.filter(([x, y]) => !taken.has(`${x},${y}`));
+    return free.length ? free : this.layout.wander;
   }
 
   get working() {
@@ -118,7 +131,7 @@ export class Actor {
     this.dir = 'down';
     this.idleWait -= dtMs;
     if (this.idleWait <= 0) {
-      const points = this.layout.wander;
+      const points = this.freeWanderPoints();
       const next = points[Math.floor(rand() * points.length) % points.length];
       this.idleWait = 3000 + rand() * 5000;
       if (next[0] !== this.x || next[1] !== this.y) this.goTo(next);
