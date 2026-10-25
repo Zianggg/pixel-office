@@ -22,7 +22,7 @@
   "char":            { "file": "char.png", "w": 32, "h": 64, "frames": 8, "anchor": [0, 32] },
   "acc_tie":         { "file": "acc_tie.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 21] },
   "acc_cap":         { "file": "acc_cap.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 1] },
-  "acc_glasses":     { "file": "acc_glasses.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 11] },
+  "acc_glasses":     { "file": "acc_glasses.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 10] },
   "acc_headset":     { "file": "acc_headset.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 1] },
   "acc_bow":         { "file": "acc_bow.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 1] },
   "acc_beanie":      { "file": "acc_beanie.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 0] },
