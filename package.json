@@ -1,0 +1,8 @@
+{
+  "name": "pixel-office",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
