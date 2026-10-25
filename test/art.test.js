@@ -122,7 +122,8 @@ test('char uses the shirt and hair key colors so it can be recolored', () => {
 });
 
 test('prop sprites match their tile footprints in layout.json', () => {
-  for (const p of layout.props) {
+  // Props whose sprite is not drawn yet are skipped here; REQUIRED is what demands they exist.
+  for (const p of layout.props.filter((q) => manifest[q.sprite])) {
     const m = manifest[p.sprite];
     assert.deepEqual([m.w, m.h], [p.w * layout.tile, p.h * layout.tile], `${p.sprite} footprint`);
   }

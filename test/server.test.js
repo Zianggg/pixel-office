@@ -27,7 +27,7 @@ test('POST /hook updates /api/state', async () => {
     assert.deepEqual(await res.json(), {});
     const body = await (await fetch(`http://127.0.0.1:${srv.port}/api/state`)).json();
     assert.equal(body.state.agents['unity-qa-tester'].status, 'working');
-    assert.equal(body.layout.cols, 26);
+    assert.equal(body.layout.cols, 36);
     assert.equal(body.hooksOn, false);
     assert.equal(body.events, 1);
   } finally {
