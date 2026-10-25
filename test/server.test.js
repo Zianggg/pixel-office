@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -92,5 +92,28 @@ test('state is rebuilt from the log on restart', async () => {
     assert.equal(body.state.agents['unity-qa-tester'].status, 'working');
   } finally {
     await b.close();
+  }
+});
+
+test('debugRaw appends every raw hook payload to raw.jsonl; off by default', async () => {
+  const dir = tmp();
+  const srv = await createOfficeServer({
+    dataDir: dir, publicDir: path.join(root, 'public'), layout, projectDir: tmp(), port: 0, debugRaw: true,
+  });
+  try {
+    await post(srv.port, { ...startPayload, extra: 'kept as is' });
+    const lines = readFileSync(path.join(dir, 'raw.jsonl'), 'utf8').trim().split('\n');
+    assert.equal(lines.length, 1);
+    assert.equal(JSON.parse(lines[0]).extra, 'kept as is');
+  } finally {
+    await srv.close();
+  }
+  const quiet = tmp();
+  const srv2 = await start(quiet);
+  try {
+    await post(srv2.port, startPayload);
+    assert.equal(existsSync(path.join(quiet, 'raw.jsonl')), false);
+  } finally {
+    await srv2.close();
   }
 });

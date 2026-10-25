@@ -63,6 +63,19 @@ test('on then off installs hooks, runs the server, and restores settings', async
   assert.match(status2.stdout, /Hook: TẮT · Server: tắt/);
 });
 
+test('off removes a settings file that on had to create', async () => {
+  const port = await freePort();
+  const project = tmp();
+  const file = path.join(project, '.claude', 'settings.local.json');
+  const dataDir = tmp();
+  const on = runCli(['on', '--project', project], port, dataDir);
+  assert.equal(on.status, 0, on.stdout + on.stderr);
+  assert.ok(existsSync(file));
+  const off = runCli(['off', '--project', project], port, dataDir);
+  assert.equal(off.status, 0, off.stdout + off.stderr);
+  assert.equal(existsSync(file), false, 'settings.local.json should be gone again');
+});
+
 test('unknown command prints usage and exits 2', () => {
   const r = runCli(['dance'], 1, tmp());
   assert.equal(r.status, 2);

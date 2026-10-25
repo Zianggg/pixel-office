@@ -1,6 +1,6 @@
 // office on|off|status|demo — turns the Pixel Office hooks and server on or off.
 import { spawn } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, rmSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -89,7 +89,12 @@ async function on(project) {
 async function off(project) {
   const file = settingsFile(project);
   const settings = loadSettings(file);
-  if (hasOfficeHooks(settings, hookUrl(port))) writeSettings(file, removeOfficeHooks(settings, hookUrl(port)));
+  if (hasOfficeHooks(settings, hookUrl(port))) {
+    const rest = removeOfficeHooks(settings, hookUrl(port));
+    // Nothing else left means `on` created the file — remove it so the project is exactly as before.
+    if (Object.keys(rest).length === 0) rmSync(file, { force: true });
+    else writeSettings(file, rest);
+  }
   console.log(`✓ Đã gỡ hook khỏi ${project}`);
   if (await probe()) {
     await fetch(`${base}/shutdown`, { method: 'POST' }).catch(() => {});

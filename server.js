@@ -1,6 +1,6 @@
 // Pixel Office server: receives Claude Code http hooks, keeps state, streams it over SSE.
 import http from 'node:http';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { summarize } from './lib/summarize.js';
@@ -57,7 +57,8 @@ function serveStatic(publicDir, urlPath, res) {
   res.end(readFileSync(file));
 }
 
-export async function createOfficeServer({ dataDir, publicDir, layout, projectDir, port = 4848, now = Date.now }) {
+// debugRaw (OFFICE_DEBUG=1): also append each raw hook body to raw.jsonl — full payloads, for checking real hook fields only.
+export async function createOfficeServer({ dataDir, publicDir, layout, projectDir, port = 4848, now = Date.now, debugRaw = false }) {
   const log = createEventLog({ dir: dataDir });
   let state = log.readTail(2000).reduce((s, ev) => reduce(s, ev, layout), createState(layout));
   state = tick(state, now());
@@ -81,6 +82,10 @@ export async function createOfficeServer({ dataDir, publicDir, layout, projectDi
     const url = new URL(req.url, 'http://127.0.0.1');
     if (req.method === 'POST' && url.pathname === '/hook') {
       const body = await readBody(req);
+      if (debugRaw) {
+        mkdirSync(dataDir, { recursive: true });
+        appendFileSync(path.join(dataDir, 'raw.jsonl'), body.replace(/\r?\n/g, ' ') + '\n');
+      }
       let ev = null;
       try {
         ev = summarize(JSON.parse(body), now());
@@ -159,6 +164,7 @@ if (isMain) {
     layout: JSON.parse(readFileSync(path.join(publicDir, 'layout.json'), 'utf8')),
     projectDir: process.env.OFFICE_PROJECT || 'E:\\UnityProject',
     port: Number(process.env.OFFICE_PORT || 4848),
+    debugRaw: process.env.OFFICE_DEBUG === '1',
   });
   srv.server.on('close', () => process.exit(0));
   console.log(`[office] đang chạy ở http://127.0.0.1:${srv.port}`);
