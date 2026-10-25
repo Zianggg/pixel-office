@@ -149,3 +149,23 @@ test('main thread tools and Stop drive the boss', () => {
   assert.equal(s.agents.__main__.status, 'done');
   assert.equal(s.agents.__main__.endedAt, 20);
 });
+
+test('a waiting notification without agent fields goes to the agent with an open tool call', () => {
+  const s = run([
+    ev({ ev: 'SubagentStart', agentId: 'a1', agentType: QA, t: 1 }),
+    ev({ agentId: 'a1', agentType: QA, tool: 'Bash', toolUseId: 'u1', detail: 'touch x', t: 2 }),
+    ev({ ev: 'Notification', waiting: true, detail: 'Claude needs your permission', t: 3 }),
+  ]);
+  assert.equal(s.agents[QA].status, 'waiting');
+  assert.equal(s.agents.__main__.status, 'idle');
+});
+
+test('a waiting notification falls back to the boss when no tool call is open', () => {
+  const s = run([
+    ev({ agentId: 'a1', agentType: QA, tool: 'Bash', toolUseId: 'u1', t: 1 }),
+    ev({ ev: 'PostToolUse', agentId: 'a1', agentType: QA, tool: 'Bash', toolUseId: 'u1', t: 2 }),
+    ev({ ev: 'Notification', waiting: true, t: 3 }),
+  ]);
+  assert.equal(s.agents.__main__.status, 'waiting');
+  assert.equal(s.agents[QA].status, 'working');
+});

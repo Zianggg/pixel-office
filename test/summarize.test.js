@@ -90,3 +90,16 @@ test('clip cuts by code point and appends an ellipsis', () => {
   assert.equal(Array.from(out).length, 6);
   assert.equal(clip('ngắn', 10), 'ngắn');
 });
+
+test('real Claude Code 2.1.310 permission Notification (raised by a subagent) is waiting with no agent fields', () => {
+  // Captured with OFFICE_DEBUG=1 while a general-purpose subagent asked to run `touch` (scratchpad_dir trimmed).
+  const real = {
+    session_id: 'c67dfb2c-c6c3-48c6-a364-e7de600c2415', cwd: 'E:\UnityProject',
+    prompt_id: 'f315cbd9-2ce2-4b5d-881c-52207f494df9', hook_event_name: 'Notification',
+    message: 'Claude needs your permission', notification_type: 'permission_prompt',
+  };
+  const ev = summarize(real, 5);
+  assert.equal(ev.waiting, true);
+  assert.equal(ev.agentId, null);
+  assert.equal(ev.agentType, null);
+});
