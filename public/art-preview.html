@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Duyệt sprite — Pixel Office</title>
+  <link rel="icon" href="data:,">
+  <style>
+    body { margin: 0; padding: 16px; background: #1d1712; color: #f4f1ea; font: 14px/1.4 "Segoe UI", system-ui, sans-serif; }
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    h2 { font-size: 15px; margin: 24px 0 8px; color: #b9a998; }
+    p { margin: 0 0 12px; color: #b9a998; }
+    .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    figure { margin: 0; padding: 8px; background: #2b221b; border: 1px solid #4a3b2f; border-radius: 6px; }
+    figcaption { font-size: 12px; color: #b9a998; margin-top: 4px; }
+    canvas { display: block; image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+  <h1>Duyệt sprite</h1>
+  <p>Mọi sprite và mọi khung, phóng ×3 trên nền gạch. Sprite vẽ bằng MCP pixelart, chỉ dùng màu trong <code>palette.json</code>.</p>
+  <h2>Đồ vật &amp; giao diện</h2>
+  <div class="grid" id="sprites"></div>
+  <h2>9 nhân vật đã đổi màu (đứng · sau lưng · đi xuống ×2 · đi ngang ×2 · gõ phím ×2)</h2>
+  <div class="grid" id="agents"></div>
+  <script type="module">
+    import { loadSprites, drawSprite, addAgentSprite } from './js/sprites.js';
+
+    const SCALE = 3;
+    const sprites = await loadSprites('art/');
+    const layout = await (await fetch('layout.json')).json();
+
+    function tile(name, frames, w, h, caption) {
+      const pad = 4;
+      const c = document.createElement('canvas');
+      c.width = (frames * (w + pad) - pad) * SCALE;
+      c.height = h * SCALE;
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      for (let y = 0; y < h; y += 32) for (let x = 0; x < c.width / SCALE; x += 32) drawSprite(ctx, sprites, 'floor', 0, x * SCALE, y * SCALE, { scale: SCALE });
+      for (let f = 0; f < frames; f++) drawSprite(ctx, sprites, name, f, f * (w + pad) * SCALE, 0, { scale: SCALE, w, h });
+      const fig = document.createElement('figure');
+      fig.append(c);
+      const cap = document.createElement('figcaption');
+      cap.textContent = caption;
+      fig.append(cap);
+      return fig;
+    }
+
+    const list = document.getElementById('sprites');
+    for (const [name, s] of Object.entries(sprites.images)) {
+      if (name.includes(':')) continue;
+      list.append(tile(name, s.frames, s.w, s.h, `${name} · ${s.w}×${s.h}${s.frames > 1 ? ` · ${s.frames} khung` : ''}`));
+    }
+
+    const agents = document.getElementById('agents');
+    for (const a of layout.agents) {
+      addAgentSprite(sprites, a.type, a);
+      agents.append(tile(`char:${a.type}`, 8, 32, 48, `${a.name} · áo ${a.shirt} · tóc ${a.hair} · ${a.acc ?? 'không phụ kiện'}`));
+    }
+  </script>
+</body>
+</html>
