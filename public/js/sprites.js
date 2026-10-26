@@ -69,7 +69,19 @@ export function charMeta(sprites, key, T) {
   return sprites.images[`char:${key}`] ?? sprites.images.char ?? { w: T, h: 2 * T, anchor: [0, T] };
 }
 
+// Sprite name of an agent's body: its own hand-drawn sheet (char_<kit>) when there is one, else the shared body.
+export function charSheet(sprites, cfg) {
+  const own = cfg?.kit && `char_${cfg.kit}`;
+  return own && sprites.images[own] ? own : 'char';
+}
+
 export function addAgentSprite(sprites, key, cfg) {
+  const sheet = charSheet(sprites, cfg);
+  if (sheet !== 'char') {
+    // Own sheets are drawn in their final colors with accessories built in: no recolor, no overlay.
+    sprites.images[`char:${key}`] = sprites.images[sheet];
+    return;
+  }
   const base = sprites.images.char;
   const pal = sprites.palette;
   if (!base || !pal) return;

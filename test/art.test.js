@@ -184,3 +184,13 @@ test('floor and wall tiles have no transparent pixels', () => {
 test('no legacy palette remains', () => {
   assert.equal(palette.legacy, undefined);
 });
+
+const OWN_SHEETS = ['char_boss', 'char_qa', 'char_build'];
+
+test('pilot agents have their own 32×64×8 character sheet with the shared char anchor', () => {
+  for (const name of OWN_SHEETS) {
+    const m = manifest[name];
+    assert.ok(m, `missing sprite "${name}"`);
+    assert.deepEqual([m.w, m.h, m.frames, m.anchor], [32, 64, 8, [0, 32]], `size/anchor of "${name}"`);
+  }
+});

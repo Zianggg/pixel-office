@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildGrid } from '../public/js/path.js';
 import { Actor, FRAMES, accFrame, recolor, spriteBox, agentColorMap, pickActor } from '../public/js/actors.js';
-import { charMeta } from '../public/js/sprites.js';
+import { charMeta, charSheet } from '../public/js/sprites.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
 const grid = buildGrid(layout);
@@ -147,4 +147,12 @@ test('pickActor returns the front-most actor where two sprites overlap', () => {
   assert.equal(pickActor(crowd.values(), 80, 110, () => meta), front);
   assert.equal(pickActor(crowd.values(), 80, 70, () => meta), back);
   assert.equal(pickActor(crowd.values(), 10, 10, () => meta), undefined);
+});
+
+test('charSheet picks the agent own sheet when drawn, else the shared recolorable body', () => {
+  const sprites = { images: { char: {}, char_boss: {} } };
+  assert.equal(charSheet(sprites, { kit: 'boss' }), 'char_boss');
+  assert.equal(charSheet(sprites, { kit: 'qa' }), 'char');
+  assert.equal(charSheet(sprites, { shirt: 'grey' }), 'char');
+  assert.equal(charSheet(sprites, undefined), 'char');
 });
