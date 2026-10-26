@@ -64,7 +64,7 @@
   "poster":          { "file": "poster.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "pingpong":        { "file": "pingpong.png", "w": 96, "h": 64, "frames": 1, "anchor": [0, 0] },
   "beanbag":         { "file": "beanbag.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
-  "char_boss":       { "file": "char_boss.png", "w": 32, "h": 64, "frames": 8, "anchor": [0, 32] },
+  "char_boss":       { "file": "char_boss.png", "w": 64, "h": 64, "frames": 9, "anchor": [16, 32] },
   "char_qa":         { "file": "char_qa.png", "w": 32, "h": 64, "frames": 8, "anchor": [0, 32] },
   "char_build":      { "file": "char_build.png", "w": 32, "h": 64, "frames": 8, "anchor": [0, 32] }
 }

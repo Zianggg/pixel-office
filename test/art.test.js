@@ -185,22 +185,23 @@ test('no legacy palette remains', () => {
   assert.equal(palette.legacy, undefined);
 });
 
-const OWN_SHEETS = ['char_boss', 'char_qa', 'char_build'];
+const OWN_SHEETS = ['char_boss', 'sit_boss'];
+const SHEET_SIZE = { char: [64, 64, 9, [16, 32]], sit: [64, 64, 8, [16, 32]] };
 
-test('pilot agents have their own 32×64×8 character sheet with the shared char anchor', () => {
+test('own character sheets are 64×64: 9 stand/walk frames or 8 seated frames, anchor [16, 32]', () => {
   for (const name of OWN_SHEETS) {
     const m = manifest[name];
     assert.ok(m, `missing sprite "${name}"`);
-    assert.deepEqual([m.w, m.h, m.frames, m.anchor], [32, 64, 8, [0, 32]], `size/anchor of "${name}"`);
+    assert.deepEqual([m.w, m.h, m.frames, m.anchor], SHEET_SIZE[name.split('_')[0]], `size/anchor of "${name}"`);
   }
 });
 
-test('character sheets leave the ground shadow to the code: no pixels below the feet', () => {
-  for (const name of ['char', ...OWN_SHEETS]) {
+test('stand/walk sheets leave the ground shadow to the code: no pixels in rows 61+', () => {
+  for (const name of ['char', ...OWN_SHEETS.filter((n) => n.startsWith('char_'))]) {
     const m = manifest[name];
     const px = pixels(readPng(new URL(m.file, ART)));
     const w = m.w * m.frames;
-    const low = px.filter((p, i) => p.alpha && Math.floor(i / w) >= 59).length;
-    assert.equal(low, 0, `${name} has ${low} pixels in rows 59+`);
+    const low = px.filter((p, i) => p.alpha && Math.floor(i / w) >= 61).length;
+    assert.equal(low, 0, `${name} has ${low} pixels in rows 61+`);
   }
 });
