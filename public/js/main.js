@@ -1,7 +1,7 @@
 // Wires state (REST + SSE), the 12 fps render loop, clicks and the panel together.
 import { buildGrid } from './path.js';
 import { Actor, pickActor } from './actors.js';
-import { loadSprites, addAgentSprite, charMeta } from './sprites.js';
+import { loadSprites, addAgentSprite, actorMeta, opaqueAt } from './sprites.js';
 import { drawStatic, drawDynamic } from './room.js';
 import { drawOverlay, drawWhiteboardText } from './overlay.js';
 import { glowSources, sunBeams, drawGlow } from './glow.js';
@@ -37,7 +37,7 @@ function syncActors(now) {
   for (const view of Object.values(state.agents)) {
     let actor = actors.get(view.key);
     if (!actor) {
-      const cfg = layout.agents.find((a) => a.type === view.key) ?? { shirt: 'grey', hair: 'dark', pants: 'charcoal', acc: null };
+      const cfg = layout.agents.find((a) => a.type === view.key) ?? { shirt: 'grey', hair: 'dark', pants: 'charcoal' };
       addAgentSprite(sprites, view.key, cfg);
       actor = new Actor(view, layout, grid, Math.random, actors);
       actors.set(view.key, actor);
@@ -140,7 +140,8 @@ function actorAt(clientX, clientY) {
   const x = ((clientX - r.left) / r.width) * W;
   const y = ((clientY - r.top) / r.height) * H;
   const T = layout.tile;
-  return pickActor(actors.values(), x, y, (a) => charMeta(sprites, a.view.key, T));
+  const shown = (a) => `${a.sprite.sheet}:${a.view.key}`;
+  return pickActor(actors.values(), x, y, (a) => actorMeta(sprites, a.view.key, a.sprite.sheet, T), (a, lx, ly) => opaqueAt(sprites, shown(a), a.sprite.frame, a.sprite.flip, lx, ly));
 }
 
 overlay.addEventListener('click', (e) => {

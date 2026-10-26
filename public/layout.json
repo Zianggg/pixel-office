@@ -9,15 +9,15 @@
   ],
   "dividers": [{"x":24,"y":0,"h":20,"doors":[5,15]}],
   "agents": [
-    { "type": "__main__", "name": "Trưởng phòng", "role": "Điều phối pipeline", "shirt": "red", "hair": "dark", "pants": "charcoal", "acc": "tie", "desk": 0, "kit": "boss" },
-    { "type": "unity-game-designer", "name": "Thiết kế", "role": "Viết GDD", "shirt": "purple", "hair": "brown", "pants": "khaki", "acc": "bow", "desk": 1, "kit": "design" },
-    { "type": "unity-tech-architect", "name": "Kiến trúc sư", "role": "Kiến trúc + backlog", "shirt": "navy", "hair": "black", "pants": "denim", "acc": "glasses", "desk": 2, "kit": "architect" },
-    { "type": "unity-project-setup", "name": "Setup", "role": "Tạo project, package, git", "shirt": "orange", "hair": "blonde", "pants": "olive", "acc": "cap", "desk": 3, "kit": "setup" },
-    { "type": "unity-gameplay-programmer", "name": "Lập trình", "role": "C# gameplay + test", "shirt": "green", "hair": "dark", "pants": "denim", "acc": "headset", "desk": 4, "kit": "code" },
-    { "type": "unity-scene-builder", "name": "Dựng cảnh", "role": "Scene, prefab, UI", "shirt": "yellow", "hair": "brown", "pants": "brown", "acc": "beanie", "desk": 5, "kit": "scene" },
-    { "type": "unity-qa-tester", "name": "QA", "role": "Test + báo cáo QA", "shirt": "pink", "hair": "black", "pants": "khaki", "acc": "scarf", "desk": 6, "kit": "qa" },
-    { "type": "unity-code-reviewer", "name": "Review", "role": "Review C#", "shirt": "grey", "hair": "blonde", "pants": "charcoal", "acc": null, "desk": 7, "kit": "review" },
-    { "type": "unity-build-engineer", "name": "Build", "role": "Build player", "shirt": "brown", "hair": "dark", "pants": "olive", "acc": "helmet", "desk": 8, "kit": "build" }
+    { "type": "__main__", "name": "Trưởng phòng", "role": "Điều phối pipeline", "shirt": "red", "hair": "dark", "pants": "charcoal", "desk": 0, "kit": "boss" },
+    { "type": "unity-game-designer", "name": "Thiết kế", "role": "Viết GDD", "shirt": "purple", "hair": "brown", "pants": "khaki", "desk": 1, "kit": "design" },
+    { "type": "unity-tech-architect", "name": "Kiến trúc sư", "role": "Kiến trúc + backlog", "shirt": "navy", "hair": "black", "pants": "denim", "desk": 2, "kit": "architect" },
+    { "type": "unity-project-setup", "name": "Setup", "role": "Tạo project, package, git", "shirt": "orange", "hair": "blonde", "pants": "olive", "desk": 3, "kit": "setup" },
+    { "type": "unity-gameplay-programmer", "name": "Lập trình", "role": "C# gameplay + test", "shirt": "green", "hair": "dark", "pants": "denim", "desk": 4, "kit": "code" },
+    { "type": "unity-scene-builder", "name": "Dựng cảnh", "role": "Scene, prefab, UI", "shirt": "yellow", "hair": "brown", "pants": "brown", "desk": 5, "kit": "scene" },
+    { "type": "unity-qa-tester", "name": "QA", "role": "Test + báo cáo QA", "shirt": "pink", "hair": "black", "pants": "khaki", "desk": 6, "kit": "qa" },
+    { "type": "unity-code-reviewer", "name": "Review", "role": "Review C#", "shirt": "grey", "hair": "blonde", "pants": "charcoal", "desk": 7, "kit": "review" },
+    { "type": "unity-build-engineer", "name": "Build", "role": "Build player", "shirt": "brown", "hair": "dark", "pants": "olive", "desk": 8, "kit": "build" }
   ],
   "desks": [
     {"x":2,"y":6,"w":3,"seat":[3,7],"boss":true},

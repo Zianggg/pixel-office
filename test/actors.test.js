@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildGrid } from '../public/js/path.js';
 import { Actor, FRAMES, SIT_FRAMES, recolor, spriteBox, agentColorMap, pickActor } from '../public/js/actors.js';
-import { charMeta, charSheet } from '../public/js/sprites.js';
+import { ownSheet, actorMeta, opaqueAt } from '../public/js/sprites.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
 const grid = buildGrid(layout);
@@ -100,13 +100,6 @@ test('agentColorMap maps shirt, hair and pants keys and skips unknown ramps', ()
   assert.equal(Object.keys(agentColorMap(noPantsKeys, { shirt: 'red', hair: 'dark', pants: 'denim' })).length, 6);
 });
 
-test('charMeta falls back to a 32×64 box when no char sprite is loaded', () => {
-  assert.deepEqual(charMeta({ images: {} }, 'x', 32), { w: 32, h: 64, anchor: [0, 32] });
-  const char = { w: 32, h: 64, anchor: [0, 32], frames: 8 };
-  assert.equal(charMeta({ images: { char } }, 'x', 32), char);
-  const mine = { ...char };
-  assert.equal(charMeta({ images: { char, 'char:x': mine } }, 'x', 32), mine);
-});
 
 test('pickActor returns the front-most actor where two sprites overlap', () => {
   const meta = { w: 32, h: 64, anchor: [0, 32] };
@@ -119,13 +112,6 @@ test('pickActor returns the front-most actor where two sprites overlap', () => {
   assert.equal(pickActor(crowd.values(), 10, 10, () => meta), undefined);
 });
 
-test('charSheet picks the agent own sheet when drawn, else the shared recolorable body', () => {
-  const sprites = { images: { char: {}, char_boss: {} } };
-  assert.equal(charSheet(sprites, { kit: 'boss' }), 'char_boss');
-  assert.equal(charSheet(sprites, { kit: 'qa' }), 'char');
-  assert.equal(charSheet(sprites, { shirt: 'grey' }), 'char');
-  assert.equal(charSheet(sprites, undefined), 'char');
-});
 
 test('a new actor stands at the spawn tile on idle1, unflipped', () => {
   const a = new Actor(view(), layout, grid);
@@ -235,4 +221,33 @@ test('pickActor skips transparent pixels and picks the actor behind', () => {
   assert.equal(pickActor([front, back], 48 + 20, 64 + 50, () => meta, opaque), back);
   assert.equal(pickActor([front, back], 48 + 20, 64 + 50, () => meta, () => false), undefined);
   assert.equal(pickActor([front, back], 48 + 20, 64 + 50, () => meta), front);
+});
+
+test('ownSheet picks char_<kit> and sit_<kit> independently', () => {
+  const sprites = { images: { char: {}, sit: {}, char_boss: {} } };
+  assert.equal(ownSheet(sprites, 'char', { kit: 'boss' }), 'char_boss');
+  assert.equal(ownSheet(sprites, 'sit', { kit: 'boss' }), 'sit');
+  assert.equal(ownSheet(sprites, 'char', { kit: 'qa' }), 'char');
+  assert.equal(ownSheet(sprites, 'sit', undefined), 'sit');
+});
+
+test('actorMeta falls back to the shared sheet, then to a 2×2-tile box', () => {
+  assert.deepEqual(actorMeta({ images: {} }, 'x', 'char', 32), { w: 64, h: 64, anchor: [16, 32] });
+  const sit = { w: 64, h: 64, anchor: [16, 32], frames: 8 };
+  assert.equal(actorMeta({ images: { sit } }, 'x', 'sit', 32), sit);
+  const mine = { ...sit };
+  assert.equal(actorMeta({ images: { sit, 'sit:x': mine } }, 'x', 'sit', 32), mine);
+});
+
+test('opaqueAt reads alpha in the shown frame and mirrors when flipped; true without art', () => {
+  // A 2-frame sheet of 4×1 frames; only frame 1, x 0 is solid.
+  const data = new Uint8ClampedArray(8 * 4);
+  data[4 * 4 + 3] = 255;
+  const canvas = { width: 8, height: 1, getContext: () => ({ getImageData: () => ({ data, width: 8, height: 1 }) }) };
+  const s = { images: { x: { w: 4, h: 1, frames: 2, canvas } } };
+  assert.equal(opaqueAt(s, 'x', 1, false, 0, 0), true);
+  assert.equal(opaqueAt(s, 'x', 1, true, 3, 0), true);
+  assert.equal(opaqueAt(s, 'x', 1, false, 1, 0), false);
+  assert.equal(opaqueAt(s, 'x', 0, false, 0, 0), false);
+  assert.equal(opaqueAt({ images: {} }, 'y', 0, false, 0, 0), true);
 });

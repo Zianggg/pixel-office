@@ -64,32 +64,48 @@ export function drawSprite(ctx, sprites, name, frame, dx, dy, { scale = 1, flip 
   ctx.restore();
 }
 
-// Size and anchor of an agent's character sprite; a 1×2-tile box when no art is loaded.
-export function charMeta(sprites, key, T) {
-  return sprites.images[`char:${key}`] ?? sprites.images.char ?? { w: T, h: 2 * T, anchor: [0, T] };
+// Size and anchor of the sheet an agent is drawn with ('char' or 'sit'); a 2×2-tile box when no art is loaded.
+export function actorMeta(sprites, key, sheet, T) {
+  return sprites.images[`${sheet}:${key}`] ?? sprites.images[sheet] ?? { w: 2 * T, h: 2 * T, anchor: [T / 2, T] };
 }
 
-// Sprite name of an agent's body: its own hand-drawn sheet (char_<kit>) when there is one, else the shared body.
-export function charSheet(sprites, cfg) {
-  const own = cfg?.kit && `char_${cfg.kit}`;
-  return own && sprites.images[own] ? own : 'char';
+// Sprite name for one of an agent's sheets: its own hand-drawn one (<base>_<kit>) when loaded, else the shared one.
+export function ownSheet(sprites, base, cfg) {
+  const own = cfg?.kit && `${base}_${cfg.kit}`;
+  return own && sprites.images[own] ? own : base;
 }
 
+// Builds 'char:<key>' and 'sit:<key>': own sheets as drawn, shared sheets recolored to the agent's shirt, hair and pants.
 export function addAgentSprite(sprites, key, cfg) {
-  const sheet = charSheet(sprites, cfg);
-  if (sheet !== 'char') {
-    // Own sheets are drawn in their final colors with accessories built in: no recolor, no overlay.
-    sprites.images[`char:${key}`] = sprites.images[sheet];
-    return;
+  for (const base of ['char', 'sit']) {
+    const sheet = ownSheet(sprites, base, cfg);
+    const src = sprites.images[sheet];
+    if (!src) continue;
+    if (sheet !== base || !sprites.palette) {
+      sprites.images[`${base}:${key}`] = src;
+      continue;
+    }
+    const c = document.createElement('canvas');
+    c.width = src.canvas.width;
+    c.height = src.canvas.height;
+    const px = src.canvas.getContext('2d').getImageData(0, 0, c.width, c.height);
+    c.getContext('2d').putImageData(new ImageData(recolor(px.data, agentColorMap(sprites.palette, cfg)), c.width, c.height), 0, 0);
+    sprites.images[`${base}:${key}`] = { ...src, canvas: c };
   }
-  const base = sprites.images.char;
-  const pal = sprites.palette;
-  if (!base || !pal) return;
-  const c = document.createElement('canvas');
-  c.width = base.canvas.width;
-  c.height = base.canvas.height;
-  const ctx = c.getContext('2d');
-  const src = base.canvas.getContext('2d').getImageData(0, 0, c.width, c.height);
-  ctx.putImageData(new ImageData(recolor(src.data, agentColorMap(pal, cfg)), c.width, c.height), 0, 0);
-  sprites.images[`char:${key}`] = { ...base, canvas: c };
+}
+
+const alphaCache = new WeakMap();
+
+// Whether sprite 'name' has a solid pixel at (lx, ly) of the given frame as shown (mirrored when flipped).
+// Without art there is nothing to test against, so every point counts as solid.
+export function opaqueAt(sprites, name, frame, flip, lx, ly) {
+  const s = sprites.images[name];
+  if (!s?.canvas) return true;
+  let img = alphaCache.get(s.canvas);
+  if (!img) {
+    img = s.canvas.getContext('2d').getImageData(0, 0, s.canvas.width, s.canvas.height);
+    alphaCache.set(s.canvas, img);
+  }
+  const x = Math.min(frame, s.frames - 1) * s.w + (flip ? s.w - 1 - lx : lx);
+  return img.data[(ly * img.width + x) * 4 + 3] > 0;
 }
