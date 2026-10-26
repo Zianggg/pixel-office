@@ -41,9 +41,9 @@ Mọi thứ vẫn còn trong lịch sử git.
 
 ## 5. Ngôn ngữ thiết kế
 
-### 5.1 Tỉ lệ (khung 32×64, chân chạm đáy khung − 2 px)
-- **Khoảng 5 đầu.** Đầu (kể cả tóc) cao **12 px**; toàn thân **58–62 px**.
-- Mốc dọc (tính từ đỉnh đầu, y = 2): cằm ≈ y 13, vai ≈ y 16, eo ≈ y 30, đáy hông ≈ y 36, gối ≈ y 48, gót = y 62.
+### 5.1 Tỉ lệ (khung 32×64, gót ở hàng 60; hàng 61–63 để trống cho bóng chân do code vẽ)
+- **Khoảng 5 đầu.** Đầu (kể cả tóc) cao **12 px**; toàn thân **58–60 px**.
+- Mốc dọc (tính từ đỉnh đầu, y = 1–3): cằm ≈ y 13, vai ≈ y 16, eo ≈ y 29, đáy hông ≈ y 35, gối ≈ y 47, gót = y 60.
 - Vai rộng **1,5–2 đầu** (18–24 px) tuỳ dáng; dáng mảnh hẹp hơn, dáng đậm rộng hơn.
 - Lý do: Dead Cells giữ đầu đủ lớn để đọc khi chuyển động; Blasphemous kéo thân cao gần thật; 5 đầu là điểm giữa đọc được ở 64 px.
 
@@ -142,7 +142,7 @@ Trưởng phòng đi trọn GĐ 2–3 (concept → 17 khung) và chạy trong `o
 ## 9. Kiểm thử tự động (`node --test`)
 - Mỗi `kit` trong `layout.json` (và nhân vật khách) có `char_*` 9 khung 32×64 và `sit_*` 8 khung 64×64; kích thước PNG khớp manifest.
 - Mọi pixel không trong suốt có màu thuộc palette; mỗi nhân vật ≤ 16 màu.
-- Ở `idle1`: chiều cao vùng không trong suốt 58–62 px; hàng thấp nhất có pixel là y = 61 hoặc 62 (chân chạm cùng đường nền).
+- Ở `idle1`: chiều cao vùng không trong suốt 58–60 px; hàng thấp nhất có pixel là y = 60 (chân chạm cùng đường nền); mọi khung `char_*` không có pixel ở hàng 61+.
 - Silhouette `idle1` của mọi cặp nhân vật trùng < 85% (IoU trên mặt nạ alpha).
 - Các test hiện có của engine vẫn pass.
 
