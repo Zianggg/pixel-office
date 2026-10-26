@@ -1,6 +1,6 @@
 # Ngôn ngữ thiết kế nhân vật Pixel Office (bản 2)
 
-Ngày: 2026-10-26 · Trạng thái: đề xuất, chờ duyệt · Thay cho phần "Phong cách" và "Tỉ lệ" trong `docs/superpowers/specs/2026-10-26-hibit-characters-design.md`
+Ngày: 2026-10-26 · Trạng thái: **ĐÃ THAY THẾ** bởi `2026-10-26-character-design-language-v3.md` (người dùng bỏ hướng mannequin 3 đầu)
 
 Người dùng nhận xét Trưởng phòng 64×64 (commit b1f2119) có bố cục khuôn mặt và cơ thể chưa đạt, và yêu cầu dựa vào 3 video dưới đây để làm lại toàn bộ ngôn ngữ thiết kế nhân vật.
 
