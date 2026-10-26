@@ -1,20 +1,23 @@
 // Character movement, animation frames and palette recoloring. No DOM at import time.
 import { findPath } from './path.js';
 
-export const FRAMES = { down: 0, up: 1, walkDown1: 2, walkDown2: 3, walkSide1: 4, walkSide2: 5, type1: 6, type2: 7 };
-
-// Accessory sheets hold 3 views: 0 front, 1 back, 2 side — indexed by character frame.
-const ACC_VIEW = [0, 1, 0, 0, 2, 2, 1, 1];
-
-export function accFrame(charFrame, accFrames) {
-  const view = ACC_VIEW[charFrame] ?? 0;
-  return view < accFrames ? view : 0;
-}
+// Stand/walk sheet (char*): 3/4 front facing down-right, 3/4 back for walking up.
+export const FRAMES = { idle1: 0, idle2: 1, walk1: 2, walk2: 3, walk3: 4, walk4: 5, back: 6, walkBack1: 7, walkBack2: 8 };
+// Seated sheet (sit*): the agent on its desk chair, one loop per work status.
+export const SIT_FRAMES = { type1: 0, type2: 1, type3: 2, type4: 3, wait1: 4, wait2: 5, error1: 6, error2: 7 };
 
 const SPEED = 2 / 1000; // tiles per ms
-const STEP_ANIM_MS = 200;
-const TYPE_ANIM_MS = 250;
-const WORK = new Set(['working', 'waiting', 'error']);
+const STEP_ANIM_MS = 150;
+const BREATH_MS = [600, 400];
+const WALK_CYCLE = [FRAMES.walk1, FRAMES.walk2, FRAMES.walk3, FRAMES.walk4];
+const BACK_CYCLE = [FRAMES.walkBack1, FRAMES.back, FRAMES.walkBack2, FRAMES.back];
+// Per status: [ms per frame, frames].
+const SIT_ANIM = {
+  working: [180, [SIT_FRAMES.type1, SIT_FRAMES.type2, SIT_FRAMES.type3, SIT_FRAMES.type4]],
+  waiting: [500, [SIT_FRAMES.wait1, SIT_FRAMES.wait2]],
+  error: [300, [SIT_FRAMES.error1, SIT_FRAMES.error2]],
+};
+const WORK = new Set(Object.keys(SIT_ANIM));
 
 function hexToRgb(hex) {
   const n = parseInt(hex.slice(1), 16);
@@ -41,11 +44,13 @@ export function spriteBox(px, meta) {
   return { x: px.x - meta.anchor[0], y: px.y - meta.anchor[1], w: meta.w, h: meta.h };
 }
 
-// The actor whose drawn box holds world point (x, y); where sprites overlap, the one drawn last (lowest on screen) wins.
-export function pickActor(actors, x, y, metaFor) {
+// The actor drawn at world point (x, y); where sprites overlap, the one drawn last (lowest on screen) wins.
+// opaque(actor, lx, ly) tells whether the actor's shown sprite has a pixel at box-local (lx, ly).
+export function pickActor(actors, x, y, metaFor, opaque = () => true) {
   return [...actors].sort((a, b) => b.px.y - a.px.y).find((a) => {
     const box = spriteBox(a.px, metaFor(a));
-    return x >= box.x && x < box.x + box.w && y >= box.y && y < box.y + box.h;
+    const inside = x >= box.x && x < box.x + box.w && y >= box.y && y < box.y + box.h;
+    return inside && opaque(a, x - box.x, y - box.y);
   });
 }
 
@@ -75,7 +80,8 @@ export class Actor {
     this.dir = 'down';
     this.flip = false;
     this.walkClock = 0;
-    this.typeClock = 0;
+    this.sitClock = 0;
+    this.breathClock = 0;
     this.idleWait = 0;
   }
 
@@ -92,6 +98,8 @@ export class Actor {
   }
 
   sync(view) {
+    // A new status restarts the seated loop so it opens on that status's first frame.
+    if (view.status !== this.view.status) this.sitClock = 0;
     this.view = view;
     const spot = this.workSpot();
     const headingToSpot = this.target && this.target[0] === spot[0] && this.target[1] === spot[1];
@@ -120,9 +128,15 @@ export class Actor {
     return this.x === sx && this.y === sy;
   }
 
+  // Seated on a desk chair (the guest spot has no chair, so an agent working there stands).
+  get seatedAtDesk() {
+    return this.seated && Boolean(this.layout.desks[this.view.desk]);
+  }
+
   update(dtMs, rand = this.rand) {
     if (this.path.length) {
       this.walkClock += dtMs;
+      this.breathClock = 0;
       let budget = dtMs * SPEED;
       while (budget > 0 && this.path.length) {
         const [nx, ny] = this.path[0];
@@ -132,8 +146,11 @@ export class Actor {
         if (dx !== 0) {
           this.dir = 'side';
           this.flip = dx < 0;
-        } else if (dy !== 0) {
-          this.dir = dy > 0 ? 'down' : 'up';
+        } else if (dy > 0) {
+          this.dir = 'down';
+          this.flip = false;
+        } else if (dy < 0) {
+          this.dir = 'up';
         }
         if (dist <= budget) {
           this.x = nx;
@@ -148,8 +165,9 @@ export class Actor {
       }
       return;
     }
+    this.breathClock += dtMs;
     if (this.working) {
-      this.typeClock += dtMs;
+      this.sitClock += dtMs;
       return;
     }
     this.dir = 'down';
@@ -162,18 +180,18 @@ export class Actor {
     }
   }
 
-  get frame() {
-    if (this.seated) {
-      if (this.view.status !== 'working') return FRAMES.type1;
-      return Math.floor(this.typeClock / TYPE_ANIM_MS) % 2 ? FRAMES.type2 : FRAMES.type1;
+  // Which sheet to draw ('char' standing/walking, 'sit' on a desk chair), its frame and mirroring.
+  get sprite() {
+    if (this.seatedAtDesk) {
+      const [ms, frames] = SIT_ANIM[this.view.status];
+      return { sheet: 'sit', frame: frames[Math.floor(this.sitClock / ms) % frames.length], flip: false };
     }
     if (this.path.length) {
-      const alt = Math.floor(this.walkClock / STEP_ANIM_MS) % 2;
-      if (this.dir === 'side') return alt ? FRAMES.walkSide2 : FRAMES.walkSide1;
-      if (this.dir === 'up') return FRAMES.up;
-      return alt ? FRAMES.walkDown2 : FRAMES.walkDown1;
+      const cycle = this.dir === 'up' ? BACK_CYCLE : WALK_CYCLE;
+      return { sheet: 'char', frame: cycle[Math.floor(this.walkClock / STEP_ANIM_MS) % cycle.length], flip: this.flip };
     }
-    return FRAMES.down;
+    const breath = this.breathClock % (BREATH_MS[0] + BREATH_MS[1]);
+    return { sheet: 'char', frame: breath < BREATH_MS[0] ? FRAMES.idle1 : FRAMES.idle2, flip: this.flip };
   }
 
   get px() {
