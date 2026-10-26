@@ -1,5 +1,5 @@
 // High-resolution overlay: status lamps, tool badges, name tags and speech bubbles.
-import { drawSprite, charMeta } from './sprites.js';
+import { drawSprite, actorMeta } from './sprites.js';
 import { spriteBox } from './actors.js';
 import { lampGlowColor } from './glow.js';
 
@@ -105,7 +105,7 @@ export function drawOverlay(ctx, s, actors, state, now, sprites, bubbles, k = 1)
   for (const actor of sorted) {
     const view = state.agents[actor.view.key];
     if (!view) continue;
-    const box = spriteBox(actor.px, charMeta(sprites, actor.view.key, 16 * k));
+    const box = spriteBox(actor.px, actorMeta(sprites, actor.view.key, actor.sprite.sheet, 16 * k));
     const cx = (box.x + box.w / 2) * s;
     const head = box.y * s;
     const feet = (box.y + box.h) * s;

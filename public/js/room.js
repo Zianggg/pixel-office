@@ -1,5 +1,5 @@
 // Draws the office: static background once, then per-frame desks, chairs and actors.
-import { drawSprite, charMeta } from './sprites.js';
+import { drawSprite, actorMeta } from './sprites.js';
 import { spriteBox } from './actors.js';
 import { roomAt } from './path.js';
 import { monitorPos, deskKits } from './desks.js';
@@ -53,6 +53,11 @@ export function drawStatic(ctx, layout, sprites) {
   });
 }
 
+// "x,y" seat tiles taken by an agent sitting at its desk; those chairs are part of the agent's seated sprite.
+export function occupiedSeats(actors) {
+  return new Set([...actors].filter((a) => a.seatedAtDesk).map((a) => `${a.x},${a.y}`));
+}
+
 function monitorFrame(agent) {
   if (!agent) return MONITOR.off;
   if (agent.status === 'error') return MONITOR.err;
@@ -68,15 +73,21 @@ export function drawDynamic(ctx, layout, sprites, state, actors) {
     drawSprite(ctx, sprites, 'monitor', monitorFrame(byDesk.get(i)), m.x, m.y, { w: T, h: T });
   });
   const shade = sprites.palette?.colors.shadow;
-  if (shade) drawShadows(ctx, [...actors.values()].map((a) => footShadow(spriteBox(a.px, charMeta(sprites, a.view.key, T)))), shade);
+  const boxOf = (a) => spriteBox(a.px, actorMeta(sprites, a.view.key, a.sprite.sheet, T));
+  const standing = [...actors.values()].filter((a) => !a.seatedAtDesk);
+  if (shade) drawShadows(ctx, standing.map((a) => footShadow(boxOf(a))), shade);
+  const taken = occupiedSeats(actors.values());
   // Y-sorted: actors and chairs; a chair at the same row draws after the actor so its back covers the legs.
   const items = [
-    ...layout.desks.map((d, i) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, i % 2 ? 'chair2' : 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),
+    ...layout.desks
+      .filter((d) => !taken.has(`${d.seat[0]},${d.seat[1]}`))
+      .map((d) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, d.boss ? 'chairBoss' : 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),
     ...[...actors.values()].map((a) => ({
       y: a.px.y,
       draw: () => {
-        const b = spriteBox(a.px, charMeta(sprites, a.view.key, T));
-        drawSprite(ctx, sprites, `char:${a.view.key}`, a.frame, b.x, b.y, { flip: a.flip, w: b.w, h: b.h });
+        const s = a.sprite;
+        const b = boxOf(a);
+        drawSprite(ctx, sprites, `${s.sheet}:${a.view.key}`, s.frame, b.x, b.y, { flip: s.flip, w: b.w, h: b.h });
       },
     })),
   ];

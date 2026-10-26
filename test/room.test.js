@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { deskKits, tileAt } from '../public/js/room.js';
+import { deskKits, tileAt, occupiedSeats } from '../public/js/room.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
 
@@ -29,4 +29,9 @@ test('tileAt names wall, trim, floor, divider and doorway tiles', () => {
   assert.equal(tileAt(l, 24, 5), 'doorway');
   assert.equal(tileAt(l, 24, 15), 'doorway');
   assert.equal(tileAt(l, 99, 0), null);
+});
+
+test('occupiedSeats lists only actors seated at a desk', () => {
+  const actors = new Map([['a', { seatedAtDesk: true, x: 8, y: 7 }], ['b', { seatedAtDesk: false, x: 12, y: 7 }]]);
+  assert.deepEqual(occupiedSeats(actors.values()), new Set(['8,7']));
 });

@@ -28,11 +28,8 @@ test('propShadow hugs the bottom edge and leans right, away from the top-left li
   assert.ok(s.ry >= 2 && s.ry <= 4);
 });
 
-test('footShadow sits under the feet of a 32×64 character box', () => {
-  const s = footShadow({ x: 100, y: 200, w: 32, h: 64 });
-  assert.equal(s.cx, 116);
-  assert.ok(s.cy > 200 + 54 && s.cy < 200 + 64);
-  assert.ok(s.rx < 16);
+test('footShadow is a fixed 10×2 ellipse centred under a 64×64 character box', () => {
+  assert.deepEqual(footShadow({ x: 100, y: 200, w: 64, h: 64 }), { cx: 132, cy: 259, rx: 10, ry: 2 });
 });
 
 test('staticShadows covers desks, chairs and flagged floor props, never decals or wall art', () => {

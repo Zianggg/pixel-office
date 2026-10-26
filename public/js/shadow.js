@@ -23,7 +23,7 @@ export function propShadow(box) {
 
 // Shadow under a character's feet; the feet sit a few pixels above the bottom of the sprite box.
 export function footShadow(box) {
-  return { cx: Math.round(box.x + box.w / 2), cy: box.y + box.h - 5, rx: Math.round(box.w * 0.3), ry: 2 };
+  return { cx: Math.round(box.x + box.w / 2), cy: box.y + box.h - 5, rx: 10, ry: 2 };
 }
 
 // Shadows that never move: desks, their chairs, and props whose manifest entry sets "shadow".
