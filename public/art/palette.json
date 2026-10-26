@@ -61,7 +61,17 @@
     "lilac1": "#c8b4b0",
     "lilac2": "#a8949c",
     "slate": "#6a6478",
-    "shadow": "#3e2a3c"
+    "shadow": "#3e2a3c",
+    "wood1": "#f0cf8e",
+    "wood2": "#d39a5a",
+    "wood3": "#a86c40",
+    "wood4": "#774537",
+    "wood5": "#4a2b36",
+    "leather1": "#8fd0c0",
+    "leather2": "#4fa39b",
+    "leather3": "#317a7c",
+    "leather4": "#24546a",
+    "leather5": "#1d3448"
   },
   "keys": {
     "shirt": ["#ff00ff","#b000b0","#ff80ff"],

@@ -13,7 +13,7 @@ const REQUIRED = {
   floor: [32, 32, 1], floor2: [32, 32, 1], wall: [32, 32, 1], wallTrim: [32, 32, 1],
   floorTile: [32, 32, 1], floorCarpet: [32, 32, 1], wallPantry: [32, 32, 1], wallPantryTrim: [32, 32, 1],
   wallGame: [32, 32, 1], wallGameTrim: [32, 32, 1], divider: [32, 32, 1], doorway: [32, 32, 1],
-  door: [64, 96, 1], window: [64, 64, 1], desk: [64, 32, 1], deskBoss: [96, 32, 1], chair: [32, 32, 1], chair2: [32, 32, 1],
+  door: [64, 96, 1], window: [64, 64, 1], desk: [64, 32, 1], deskBoss: [96, 32, 1], chair: [32, 32, 1], chairBoss: [32, 32, 1],
   monitor: [32, 32, 3], pc: [32, 32, 1], keyboard: [32, 16, 1], bookshelf: [64, 64, 1],
   cooler: [32, 64, 1], plant: [32, 64, 1], clock: [32, 32, 1], painting: [64, 32, 1],
   whiteboard: [64, 32, 1], bin: [32, 32, 1], mug: [16, 16, 1], char: [32, 64, 8],

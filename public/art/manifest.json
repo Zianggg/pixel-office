@@ -48,7 +48,7 @@
   "wallGameTrim":    { "file": "wallGameTrim.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "divider":         { "file": "divider.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "doorway":         { "file": "doorway.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
-  "chair2":          { "file": "chair2.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
+  "chairBoss":       { "file": "chairBoss.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "rug":             { "file": "rug.png", "w": 160, "h": 128, "frames": 1, "anchor": [0, 0] },
   "coffeeTable":     { "file": "coffeeTable.png", "w": 64, "h": 32, "frames": 1, "anchor": [0, 0] },
   "sofa":            { "file": "sofa.png", "w": 96, "h": 32, "frames": 1, "anchor": [0, 0], "shadow": true },
