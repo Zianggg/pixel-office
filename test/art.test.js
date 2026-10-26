@@ -111,6 +111,23 @@ test('palette keeps the color names the code reads', () => {
   assert.equal(palette.colors.outline, '#3d2a22');
 });
 
+// Character ramps from the style guide: tone 1 lightest .. tone 4 darkest.
+const RAMPS = ['skinLight', 'skinMid', 'skinDeep', 'hairBlack', 'hairBrown', 'fabricNavy', 'metal'];
+const luminance = (hex) => {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+test('palette has the 4-tone character ramps, light to dark', () => {
+  for (const ramp of RAMPS) {
+    const tones = [1, 2, 3, 4].map((n) => palette.colors[`${ramp}${n}`]);
+    assert.ok(tones.every(Boolean), `${ramp}1..4 missing`);
+    for (let n = 1; n < 4; n++) {
+      assert.ok(luminance(tones[n - 1]) > luminance(tones[n]), `${ramp}${n} is not lighter than ${ramp}${n + 1}`);
+    }
+  }
+});
+
 test('floor and wall tiles have no transparent pixels', () => {
   for (const name of ['floor', 'floor2', 'floorTile', 'floorCarpet', 'wall', 'wallTrim', 'wallPantry', 'wallPantryTrim', 'wallGame', 'wallGameTrim', 'divider', 'doorway']) {
     const holes = pixels(readPng(new URL(manifest[name].file, ART))).filter((p) => p.alpha !== 255).length;
