@@ -37,7 +37,7 @@ function syncActors(now) {
   for (const view of Object.values(state.agents)) {
     let actor = actors.get(view.key);
     if (!actor) {
-      const cfg = layout.agents.find((a) => a.type === view.key) ?? { shirt: 'grey', hair: 'dark', pants: 'charcoal' };
+      const cfg = layout.agents.find((a) => a.type === view.key) ?? {};
       addAgentSprite(sprites, view.key, cfg);
       actor = new Actor(view, layout, grid, Math.random, actors);
       actors.set(view.key, actor);

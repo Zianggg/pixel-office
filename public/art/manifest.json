@@ -19,15 +19,8 @@
   "whiteboard":      { "file": "whiteboard.png", "w": 64, "h": 32, "frames": 1, "anchor": [0, 0] },
   "bin":             { "file": "bin.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "mug":             { "file": "mug.png", "w": 16, "h": 16, "frames": 1, "anchor": [0, 0] },
-  "char":            { "file": "char.png", "w": 32, "h": 64, "frames": 8, "anchor": [0, 32] },
-  "acc_tie":         { "file": "acc_tie.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 21] },
-  "acc_cap":         { "file": "acc_cap.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 1] },
-  "acc_glasses":     { "file": "acc_glasses.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 10] },
-  "acc_headset":     { "file": "acc_headset.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 1] },
-  "acc_bow":         { "file": "acc_bow.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 1] },
-  "acc_beanie":      { "file": "acc_beanie.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 0] },
-  "acc_helmet":      { "file": "acc_helmet.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 1] },
-  "acc_scarf":       { "file": "acc_scarf.png", "w": 16, "h": 16, "frames": 3, "anchor": [8, 18] },
+  "char":            { "file": "char.png", "w": 32, "h": 64, "frames": 9, "anchor": [0, 32] },
+  "sit":             { "file": "sit.png", "w": 64, "h": 64, "frames": 8, "anchor": [16, 32] },
   "lamp":            { "file": "lamp.png", "w": 12, "h": 12, "frames": 5, "anchor": [6, 12] },
   "bubble":          { "file": "bubble.png", "w": 18, "h": 18, "frames": 1, "anchor": [0, 0] },
   "badge":           { "file": "badge.png", "w": 16, "h": 16, "frames": 1, "anchor": [0, 0] },
@@ -63,8 +56,5 @@
   "tvStand":         { "file": "tvStand.png", "w": 64, "h": 64, "frames": 1, "anchor": [0, 0] },
   "poster":          { "file": "poster.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
   "pingpong":        { "file": "pingpong.png", "w": 96, "h": 64, "frames": 1, "anchor": [0, 0] },
-  "beanbag":         { "file": "beanbag.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] },
-  "char_boss":       { "file": "char_boss.png", "w": 64, "h": 64, "frames": 9, "anchor": [16, 32] },
-  "char_qa":         { "file": "char_qa.png", "w": 32, "h": 64, "frames": 8, "anchor": [0, 32] },
-  "char_build":      { "file": "char_build.png", "w": 32, "h": 64, "frames": 8, "anchor": [0, 32] }
+  "beanbag":         { "file": "beanbag.png", "w": 32, "h": 32, "frames": 1, "anchor": [0, 0] }
 }

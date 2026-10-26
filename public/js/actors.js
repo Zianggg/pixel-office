@@ -1,4 +1,4 @@
-// Character movement, animation frames and palette recoloring. No DOM at import time.
+// Character movement and animation frames. No DOM at import time.
 import { findPath } from './path.js';
 
 // Stand/walk sheet (char*): 3/4 front facing down-right, 3/4 back for walking up.
@@ -19,26 +19,6 @@ const SIT_ANIM = {
 };
 const WORK = new Set(Object.keys(SIT_ANIM));
 
-function hexToRgb(hex) {
-  const n = parseInt(hex.slice(1), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
-export function recolor(rgba, map) {
-  const out = new Uint8ClampedArray(rgba);
-  const pairs = Object.entries(map).map(([from, to]) => [hexToRgb(from), hexToRgb(to)]);
-  for (let i = 0; i < out.length; i += 4) {
-    if (out[i + 3] === 0) continue;
-    for (const [[r, g, b], to] of pairs) {
-      if (out[i] === r && out[i + 1] === g && out[i + 2] === b) {
-        [out[i], out[i + 1], out[i + 2]] = to;
-        break;
-      }
-    }
-  }
-  return out;
-}
-
 // Drawn box of a sprite whose anchor is the offset from its standing tile's top-left corner.
 export function spriteBox(px, meta) {
   return { x: px.x - meta.anchor[0], y: px.y - meta.anchor[1], w: meta.w, h: meta.h };
@@ -52,17 +32,6 @@ export function pickActor(actors, x, y, metaFor, opaque = () => true) {
     const inside = x >= box.x && x < box.x + box.w && y >= box.y && y < box.y + box.h;
     return inside && opaque(a, x - box.x, y - box.y);
   });
-}
-
-// Key color → agent color for the shirt, hair and pants ramps; unknown ramps keep their key colors.
-export function agentColorMap(palette, cfg) {
-  const map = {};
-  for (const [part, ramps] of [['shirt', 'shirts'], ['hair', 'hairs'], ['pants', 'pants']]) {
-    const keys = palette.keys?.[part];
-    const ramp = palette[ramps]?.[cfg[part]];
-    if (keys && ramp) keys.forEach((k, i) => (map[k] = ramp[i]));
-  }
-  return map;
 }
 
 export class Actor {

@@ -1,0 +1,4 @@
+{
+  "char_fixture": { "file": "char_fixture.png", "w": 32, "h": 64, "frames": 9, "anchor": [0, 32] },
+  "sit_fixture":  { "file": "sit_fixture.png", "w": 64, "h": 64, "frames": 8, "anchor": [16, 32] }
+}

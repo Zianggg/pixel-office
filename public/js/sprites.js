@@ -1,5 +1,4 @@
-// Loads art/manifest.json sprites and builds recolored per-agent characters.
-import { recolor, agentColorMap } from './actors.js';
+// Loads art/manifest.json sprites and picks each agent's character sheets.
 
 const warned = new Set();
 
@@ -75,22 +74,11 @@ export function ownSheet(sprites, base, cfg) {
   return own && sprites.images[own] ? own : base;
 }
 
-// Builds 'char:<key>' and 'sit:<key>': own sheets as drawn, shared sheets recolored to the agent's shirt, hair and pants.
+// Builds 'char:<key>' and 'sit:<key>': the agent's own sheets, or the shared guest sheets when it has none.
 export function addAgentSprite(sprites, key, cfg) {
   for (const base of ['char', 'sit']) {
-    const sheet = ownSheet(sprites, base, cfg);
-    const src = sprites.images[sheet];
-    if (!src) continue;
-    if (sheet !== base || !sprites.palette) {
-      sprites.images[`${base}:${key}`] = src;
-      continue;
-    }
-    const c = document.createElement('canvas');
-    c.width = src.canvas.width;
-    c.height = src.canvas.height;
-    const px = src.canvas.getContext('2d').getImageData(0, 0, c.width, c.height);
-    c.getContext('2d').putImageData(new ImageData(recolor(px.data, agentColorMap(sprites.palette, cfg)), c.width, c.height), 0, 0);
-    sprites.images[`${base}:${key}`] = { ...src, canvas: c };
+    const src = sprites.images[ownSheet(sprites, base, cfg)];
+    if (src) sprites.images[`${base}:${key}`] = src;
   }
 }
 

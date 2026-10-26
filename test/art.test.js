@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { inflateSync } from 'node:zlib';
+import { readPng } from './png.js';
 
 const ART = new URL('../public/art/', import.meta.url);
 const manifest = JSON.parse(readFileSync(new URL('manifest.json', ART), 'utf8'));
@@ -16,9 +16,7 @@ const REQUIRED = {
   door: [64, 96, 1], window: [64, 64, 1], desk: [64, 32, 1], deskBoss: [96, 32, 1], chair: [32, 32, 1], chairBoss: [32, 32, 1],
   monitor: [32, 32, 3], pc: [32, 32, 1], keyboard: [32, 16, 1], bookshelf: [64, 64, 1],
   cooler: [32, 64, 1], plant: [32, 64, 1], clock: [32, 32, 1], painting: [64, 32, 1],
-  whiteboard: [64, 32, 1], bin: [32, 32, 1], mug: [16, 16, 1], char: [32, 64, 8],
-  acc_tie: [16, 16, 3], acc_cap: [16, 16, 3], acc_glasses: [16, 16, 3], acc_headset: [16, 16, 3],
-  acc_bow: [16, 16, 3], acc_beanie: [16, 16, 3], acc_helmet: [16, 16, 3], acc_scarf: [16, 16, 3],
+  whiteboard: [64, 32, 1], bin: [32, 32, 1], mug: [16, 16, 1], char: [32, 64, 9], sit: [64, 64, 8],
   lamp: [12, 12, 5], bubble: [18, 18, 1], badge: [16, 16, 1],
   rug: [160, 128, 1], coffeeTable: [64, 32, 1], sofa: [96, 32, 1], arcLamp: [32, 64, 1], monstera: [32, 64, 1],
   counter: [96, 64, 1], windowWide: [96, 64, 1], fridge: [32, 96, 1], pantryTable: [64, 32, 1], pantryChair: [32, 32, 1],
@@ -26,73 +24,17 @@ const REQUIRED = {
 };
 for (const a of layout.agents) if (a.kit) REQUIRED[`kit_${a.kit}`] = [32, 32, 1];
 
-// Minimal PNG reader (8-bit RGB/RGBA/palette, non-interlaced) — enough for the MCP's output.
-function readPng(file) {
-  const b = readFileSync(file);
-  assert.equal(b.readUInt32BE(0), 0x89504e47, `${file} is not a PNG`);
-  let p = 8;
-  let w, h, depth, ctype, plte, trns;
-  const idat = [];
-  while (p < b.length) {
-    const len = b.readUInt32BE(p);
-    const type = b.toString('ascii', p + 4, p + 8);
-    const d = b.subarray(p + 8, p + 8 + len);
-    if (type === 'IHDR') [w, h, depth, ctype] = [d.readUInt32BE(0), d.readUInt32BE(4), d[8], d[9]];
-    else if (type === 'PLTE') plte = d;
-    else if (type === 'tRNS') trns = d;
-    else if (type === 'IDAT') idat.push(d);
-    p += 12 + len;
-  }
-  return { w, h, depth, ctype, plte, trns, idat };
-}
-
-function pixels({ w, h, depth, ctype, plte, trns, idat }) {
-  assert.equal(depth, 8, 'expected 8-bit PNG');
-  const ch = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 }[ctype];
-  const raw = inflateSync(Buffer.concat(idat));
-  const stride = w * ch;
-  const out = Buffer.alloc(h * stride);
-  for (let y = 0; y < h; y++) {
-    const f = raw[y * (stride + 1)];
-    for (let x = 0; x < stride; x++) {
-      const a = x >= ch ? out[y * stride + x - ch] : 0;
-      const up = y ? out[(y - 1) * stride + x] : 0;
-      const c = x >= ch && y ? out[(y - 1) * stride + x - ch] : 0;
-      let v = raw[y * (stride + 1) + 1 + x];
-      if (f === 1) v += a;
-      else if (f === 2) v += up;
-      else if (f === 3) v += (a + up) >> 1;
-      else if (f === 4) {
-        const pp = a + up - c;
-        const [pa, pb, pc] = [Math.abs(pp - a), Math.abs(pp - up), Math.abs(pp - c)];
-        v += pa <= pb && pa <= pc ? a : pb <= pc ? up : c;
-      }
-      out[y * stride + x] = v & 255;
-    }
-  }
-  const hex = (r, g, b) => '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
+// Pixels as { color: '#rrggbb', alpha } for the checks below.
+function pixels(png) {
   const list = [];
-  for (let i = 0; i < w * h; i++) {
-    if (ctype === 3) {
-      const k = out[i];
-      list.push({ color: hex(plte[k * 3], plte[k * 3 + 1], plte[k * 3 + 2]), alpha: trns && k < trns.length ? trns[k] : 255 });
-    } else if (ctype === 2 || ctype === 6) {
-      list.push({ color: hex(out[i * ch], out[i * ch + 1], out[i * ch + 2]), alpha: ch === 4 ? out[i * ch + 3] : 255 });
-    } else {
-      list.push({ color: hex(out[i * ch], out[i * ch], out[i * ch]), alpha: ch === 2 ? out[i * ch + 1] : 255 });
-    }
+  for (let i = 0; i < png.rgba.length; i += 4) {
+    const [r, g, b, alpha] = png.rgba.subarray(i, i + 4);
+    list.push({ color: '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join(''), alpha });
   }
   return list;
 }
 
-const allowed = new Set(
-  [
-    ...Object.values(palette.colors),
-    ...palette.keys.shirt,
-    ...palette.keys.hair,
-    ...(palette.keys.pants ?? []),
-  ].map((c) => c.toLowerCase()),
-);
+const allowed = new Set(Object.values(palette.colors).map((c) => c.toLowerCase()));
 
 test('manifest lists every sprite the frontend needs, with the agreed size', () => {
   for (const [name, [w, h, frames]] of Object.entries(REQUIRED)) {
@@ -120,11 +62,6 @@ test('sprites use only palette colors, fully opaque or fully transparent', () =>
     }
     assert.deepEqual([...bad], [], `${name}: colors outside palette.json`);
   }
-});
-
-test('char uses the shirt, hair and pants key colors so it can be recolored', () => {
-  const colors = new Set(pixels(readPng(new URL(manifest.char.file, ART))).filter((p) => p.alpha).map((p) => p.color));
-  for (const k of [...palette.keys.shirt, ...palette.keys.hair, ...palette.keys.pants]) assert.ok(colors.has(k.toLowerCase()), `char lacks key ${k}`);
 });
 
 test('prop sprites match their tile footprints in layout.json', () => {
@@ -159,12 +96,12 @@ test('wall-hung sprites keep a transparent margin so they never touch the wall e
   }
 });
 
-test("palette defines pants keys and every agent's pants ramp", () => {
-  assert.equal(palette.keys.pants?.length, 3);
+test('characters are drawn per agent: no recoloring keys in the palette or the layout', () => {
+  for (const k of ['keys', 'shirts', 'hairs', 'pants']) assert.equal(palette[k], undefined, `palette.${k}`);
   for (const a of layout.agents) {
-    assert.ok(a.pants, `${a.type} has no pants`);
-    assert.equal(palette.pants?.[a.pants]?.length, 3, `pants ramp "${a.pants}" of ${a.type}`);
+    for (const k of ['shirt', 'hair', 'pants', 'acc']) assert.equal(a[k], undefined, `${a.type}.${k}`);
   }
+  assert.deepEqual(Object.keys(manifest).filter((n) => n.startsWith('acc_')), []);
 });
 
 test('palette keeps the color names the code reads', () => {
@@ -185,11 +122,11 @@ test('no legacy palette remains', () => {
   assert.equal(palette.legacy, undefined);
 });
 
-const OWN_SHEETS = ['char_boss', 'sit_boss'];
-const SHEET_SIZE = { char: [64, 64, 9, [16, 32]], sit: [64, 64, 8, [16, 32]] };
+const OWN_SHEETS = Object.keys(manifest).filter((n) => /^(char|sit)_/.test(n));
+const SHEET_SIZE = { char: [32, 64, 9, [0, 32]], sit: [64, 64, 8, [16, 32]] };
 
-test('own character sheets are 64×64: 9 stand/walk frames or 8 seated frames, anchor [16, 32]', () => {
-  for (const name of OWN_SHEETS) {
+test('character sheets: char 32×64 × 9 anchor [0, 32], sit 64×64 × 8 anchor [16, 32]', () => {
+  for (const name of ['char', 'sit', ...OWN_SHEETS]) {
     const m = manifest[name];
     assert.ok(m, `missing sprite "${name}"`);
     assert.deepEqual([m.w, m.h, m.frames, m.anchor], SHEET_SIZE[name.split('_')[0]], `size/anchor of "${name}"`);

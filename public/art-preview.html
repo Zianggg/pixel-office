@@ -18,45 +18,81 @@
 </head>
 <body>
   <h1>Duyệt sprite</h1>
-  <p>Mọi sprite và mọi khung, phóng ×3 trên nền gạch. Sprite vẽ bằng MCP pixelart, chỉ dùng màu trong <code>palette.json</code>.</p>
+  <p>Đồ vật phóng ×3, nhân vật ×4, trên nền sàn. Sprite vẽ bằng MCP pixelart, chỉ dùng màu trong <code>palette.json</code>.</p>
   <h2>Đồ vật &amp; giao diện</h2>
   <div class="grid" id="sprites"></div>
-  <h2>9 nhân vật đã đổi màu (đứng · sau lưng · đi xuống ×2 · đi ngang ×2 · gõ phím ×2)</h2>
+  <h2>Nhân vật: 9 khung đứng/đi (idle1, idle2, walk1–4, back, walkBack1–2) · 8 khung ngồi (type1–4, wait1–2, error1–2)</h2>
   <div class="grid" id="agents"></div>
+  <h2>Silhouette idle1 (tô đen) — phải nhận ra từng người</h2>
+  <div class="grid" id="silhouettes"></div>
   <script type="module">
-    import { loadSprites, drawSprite, addAgentSprite } from './js/sprites.js';
+    import { loadSprites, drawSprite } from './js/sprites.js';
 
     const SCALE = 3;
+    const CHAR_SCALE = 4;
+    const isCharacter = (name) => /^(char|sit)(_|$)/.test(name);
     const sprites = await loadSprites('art/');
     const layout = await (await fetch('layout.json')).json();
 
-    function tile(name, frames, w, h, caption) {
+    function strip(name, frames, w, h, scale) {
       const pad = 4;
       const c = document.createElement('canvas');
-      c.width = (frames * (w + pad) - pad) * SCALE;
-      c.height = h * SCALE;
+      c.width = (frames * (w + pad) - pad) * scale;
+      c.height = h * scale;
       const ctx = c.getContext('2d');
       ctx.imageSmoothingEnabled = false;
-      for (let y = 0; y < h; y += 32) for (let x = 0; x < c.width / SCALE; x += 32) drawSprite(ctx, sprites, 'floor', 0, x * SCALE, y * SCALE, { scale: SCALE });
-      for (let f = 0; f < frames; f++) drawSprite(ctx, sprites, name, f, f * (w + pad) * SCALE, 0, { scale: SCALE, w, h });
+      for (let y = 0; y < h; y += 32) for (let x = 0; x < c.width / scale; x += 32) drawSprite(ctx, sprites, 'floor', 0, x * scale, y * scale, { scale });
+      for (let f = 0; f < frames; f++) drawSprite(ctx, sprites, name, f, f * (w + pad) * scale, 0, { scale, w, h });
+      return c;
+    }
+
+    function figure(canvases, caption) {
       const fig = document.createElement('figure');
-      fig.append(c);
+      fig.append(...canvases);
       const cap = document.createElement('figcaption');
       cap.textContent = caption;
       fig.append(cap);
       return fig;
     }
 
+    function tile(name, frames, w, h, caption) {
+      return figure([strip(name, frames, w, h, SCALE)], caption);
+    }
+
+    // idle1 filled black, so only the outline of the character is left to recognise.
+    function silhouette(name) {
+      const c = document.createElement('canvas');
+      c.width = 32 * CHAR_SCALE;
+      c.height = 64 * CHAR_SCALE;
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      drawSprite(ctx, sprites, name, 0, 0, 0, { scale: CHAR_SCALE, w: 32, h: 64 });
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, c.width, c.height);
+      return c;
+    }
+
     const list = document.getElementById('sprites');
     for (const [name, s] of Object.entries(sprites.images)) {
-      if (name.includes(':')) continue;
+      if (name.includes(':') || isCharacter(name)) continue;
       list.append(tile(name, s.frames, s.w, s.h, `${name} · ${s.w}×${s.h}${s.frames > 1 ? ` · ${s.frames} khung` : ''}`));
     }
 
+    // One row per character in the manifest: agents by kit, then the guest (shared char/sit).
+    const people = [
+      ...layout.agents.map((a) => ({ label: `${a.name} (${a.kit})`, suffix: `_${a.kit}` })),
+      { label: 'Khách (agent lạ)', suffix: '' },
+    ].filter((p) => sprites.images[`char${p.suffix}`] || sprites.images[`sit${p.suffix}`]);
     const agents = document.getElementById('agents');
-    for (const a of layout.agents) {
-      addAgentSprite(sprites, a.type, a);
-      agents.append(tile(`char:${a.type}`, 8, 32, 64, `${a.name} · áo ${a.shirt} · tóc ${a.hair} · quần ${a.pants} · ${a.acc ?? 'không phụ kiện'}`));
+    const shapes = document.getElementById('silhouettes');
+    for (const p of people) {
+      const [char, sit] = [`char${p.suffix}`, `sit${p.suffix}`];
+      const rows = [];
+      if (sprites.images[char]) rows.push(strip(char, 9, 32, 64, CHAR_SCALE));
+      if (sprites.images[sit]) rows.push(strip(sit, 8, 64, 64, CHAR_SCALE));
+      agents.append(figure(rows, `${p.label} · ${char} · ${sit}`));
+      if (sprites.images[char]) shapes.append(figure([silhouette(char)], p.label));
     }
   </script>
 </body>

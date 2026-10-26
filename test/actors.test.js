@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildGrid } from '../public/js/path.js';
-import { Actor, FRAMES, SIT_FRAMES, recolor, spriteBox, agentColorMap, pickActor } from '../public/js/actors.js';
-import { ownSheet, actorMeta, opaqueAt } from '../public/js/sprites.js';
+import { Actor, FRAMES, SIT_FRAMES, spriteBox, pickActor } from '../public/js/actors.js';
+import { ownSheet, actorMeta, opaqueAt, addAgentSprite } from '../public/js/sprites.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
 const grid = buildGrid(layout);
@@ -37,15 +37,6 @@ function walk(a, [x, y], dx, dy, n = 3, stepMs = 150) {
   }
   return seen;
 }
-
-test('recolor swaps key colors and keeps alpha and other pixels', () => {
-  const px = new Uint8ClampedArray([255, 0, 255, 255, 10, 20, 30, 128, 255, 0, 255, 0]);
-  const out = recolor(px, { '#ff00ff': '#c03030' });
-  assert.deepEqual([...out.slice(0, 4)], [0xc0, 0x30, 0x30, 255]);
-  assert.deepEqual([...out.slice(4, 8)], [10, 20, 30, 128]);
-  assert.deepEqual([...out.slice(8, 12)], [255, 0, 255, 0]);
-  assert.deepEqual([...px.slice(0, 4)], [255, 0, 255, 255]);
-});
 
 test('actor without a desk goes to the guest spot', () => {
   const a = new Actor(view({ desk: -1 }), layout, grid);
@@ -84,22 +75,18 @@ test('spriteBox centres a 64×64 character on its tile by the [16, 32] anchor', 
   assert.deepEqual(spriteBox({ x: 64, y: 96 }, { w: 64, h: 64, anchor: [16, 32] }), { x: 48, y: 64, w: 64, h: 64 });
 });
 
-test('agentColorMap maps shirt, hair and pants keys and skips unknown ramps', () => {
-  const pal = {
-    keys: { shirt: ['#ff00ff', '#b000b0', '#ff80ff'], hair: ['#00ffff', '#00a0a0', '#80ffff'], pants: ['#ffff00', '#b0b000', '#ffff80'] },
-    shirts: { red: ['#d65a4c', '#a9443a', '#ec8478'] },
-    hairs: { dark: ['#5a4232', '#402e22', '#7a5c48'] },
-    pants: { denim: ['#5a7a9a', '#3f5a78', '#7f9db8'] },
-  };
-  const full = agentColorMap(pal, { shirt: 'red', hair: 'dark', pants: 'denim' });
-  assert.equal(Object.keys(full).length, 9);
-  assert.equal(full['#ffff00'], '#5a7a9a');
-  assert.equal(full['#b000b0'], '#a9443a');
-  assert.deepEqual(agentColorMap(pal, { shirt: 'red', hair: 'nope' }), { '#ff00ff': '#d65a4c', '#b000b0': '#a9443a', '#ff80ff': '#ec8478' });
-  const noPantsKeys = { ...pal, keys: { shirt: pal.keys.shirt, hair: pal.keys.hair } };
-  assert.equal(Object.keys(agentColorMap(noPantsKeys, { shirt: 'red', hair: 'dark', pants: 'denim' })).length, 6);
+test('addAgentSprite uses the own sheet when drawn, else the shared one as is (no recoloring)', () => {
+  const char = { w: 32, h: 64, frames: 9, anchor: [0, 32] };
+  const sit = { w: 64, h: 64, frames: 8, anchor: [16, 32] };
+  const sitQa = { ...sit };
+  const sprites = { images: { char, sit, sit_qa: sitQa }, palette: { colors: {} } };
+  addAgentSprite(sprites, 'unity-qa-tester', { kit: 'qa' });
+  assert.equal(sprites.images['char:unity-qa-tester'], char);
+  assert.equal(sprites.images['sit:unity-qa-tester'], sitQa);
+  addAgentSprite(sprites, 'art-helper', {});
+  assert.equal(sprites.images['char:art-helper'], char);
+  assert.equal(sprites.images['sit:art-helper'], sit);
 });
-
 
 test('pickActor returns the front-most actor where two sprites overlap', () => {
   const meta = { w: 32, h: 64, anchor: [0, 32] };
