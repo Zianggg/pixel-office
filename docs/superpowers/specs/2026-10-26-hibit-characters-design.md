@@ -31,7 +31,7 @@ Ngày: 2026-10-26 · Branch: `feat/retro-rooms` · Nghiên cứu: `docs/research
 
 - Anchor [16, 32]: hộp 64×64 nằm giữa ô nhân vật đứng hoặc ngồi.
 - Sheet đứng/đi: chân ở hàng 58–60; hàng 61–63 để trống.
-- Người cao 56–60px, khoảng 4,5 đầu (đầu 13–14px).
+- Người cao 56–58px, khoảng 3 đầu: đầu kể cả tóc ở hàng 3–22 (~20px), thân ở hàng 22–40 (vai 16px, eo 12px), chân ở hàng 40–60. Xem `docs/research/2026-10-26-character-design-language.md` (bản 2, đã duyệt).
 - **Sheet ngồi:** góc 3/4 sau. Ghế nằm ở dưới, chân ghế chạm hàng 60. Đỉnh đầu không cao hơn hàng 20 của sprite, để đầu nằm dưới màn hình (màn hình kết thúc ở hàng 12 của ô bàn). Hai tay vươn lên đặt vào vùng bàn phím, ở hàng 8–24 của ô bàn, tức hàng 8–24 và cột 16–47 của sprite.
 - Chỉ dùng màu có trong `palette.json`; pixel đục hoàn toàn hoặc trong suốt hoàn toàn. Bảng màu thêm các ramp 4–5 tông có hue shift.
 - Sheet chung (`char`, `sit`) dùng 3 key color cho áo, tóc, quần để `agentColorMap` đổi màu được; không có phụ kiện.
@@ -94,13 +94,19 @@ Ngày: 2026-10-26 · Branch: `feat/retro-rooms` · Nghiên cứu: `docs/research
 
 ## Phong cách (bắt buộc cho mọi sprite trong bản thử)
 
-- Ánh sáng trên-trái. Ramp 4–5 tông có hue shift: bóng ngả tím hoặc xanh lạnh, sáng ngả vàng ấm.
-- Sel-out: viền ngoài là tông tối của màu bên trong; phía sáng nhạt hơn, phía tối đậm hơn; không dùng đen thuần.
-- Nét bên trong tối hơn mảng một bậc. AA thủ công ở đường cong bên trong; không AA viền ngoài.
-- AO dưới cằm, chỗ tay áp thân, dưới thắt lưng, chỗ người chạm ghế. Viền sáng 1px ở mép trên-trái.
-- Mặt 3/4: mắt 2×2 hoặc 2×3 có 1px điểm sáng, mắt xa hẹp hơn, lông mày, mũi gợi bằng bóng, miệng 1–2px.
-- Dáng: dồn trọng tâm một chân, tay tách khỏi thân, đạo cụ ở tay phía gần.
-- `pixel_lint` từ 90 điểm trở lên.
+Nhân vật theo **ngôn ngữ thiết kế bản 2** (`docs/research/2026-10-26-character-design-language.md`). Tóm tắt:
+- **Tỉ lệ khoảng 3 đầu.** Vai hẹp hơn hoặc bằng đầu. Tay chân thon dần. Bàn tay 3×3–4×4 có ngón cái tách ra. Giày hơi to.
+- **Mặt mẫu dùng chung:**
+  - mắt cao 3px: mắt gần 3 rộng (trắng, con ngươi, điểm sáng), mắt xa 2 rộng;
+  - lông mày 1 nét, mũi 1–2px bóng, miệng 2–3px;
+  - tai ở phía xa.
+- **Hình khối:** 3 khối lớn (tóc/đầu, áo/thân, chân) cộng 1 đạo cụ. Hình vuông, tròn hoặc tam giác theo tính cách. Không ai trùng kiểu tóc.
+- **Dáng:** có đường hành động C hoặc S, dồn trọng tâm một chân, tay tách khỏi thân.
+- **Màu:** tối đa 4 chất liệu, mỗi chất liệu 3 tông (sáng, gốc, bóng; có hue shift), cộng 1 màu viền và 1 màu nhấn; khoảng 14–16 màu một sprite.
+- **Bóng cel tô tay**, ranh giới rõ, ánh sáng trên-trái. Không dùng `shade_region` hay `outline_sprite` cho nhân vật.
+- **Viền 1px vẽ tay**, màu tối có sắc độ. Độ dốc sạch, không pixel đôi.
+- **Mannequin chung 64×64** (đứng 3/4, quay lưng, ngồi) là nền cho mọi nhân vật.
+- `pixel_lint`: không còn pixel lẻ.
 - **Bàn và ghế:** khối 3/4 (mặt trên, mặt trước, mặt bên phải), gỗ óc chó hoặc mật ong với ramp 5 tông, vân gỗ thưa, mép trên-trái có ánh sáng, AO ở chân.
   - Ghế văn phòng: lưng cong, có tay vịn, chân sao 5 cánh, bánh xe.
   - Ghế Trưởng phòng: ghế bành da teal lưng cao, viền đinh tán vàng.
@@ -109,9 +115,9 @@ Ngày: 2026-10-26 · Branch: `feat/retro-rooms` · Nghiên cứu: `docs/research
 
 ## Cách vẽ (MCP pixelart, không model tạo ảnh, không script vẽ tự viết)
 
-1. Vẽ bàn và ghế trước, để có kích thước thật khi vẽ sheet ngồi.
+1. Vẽ bàn và ghế trước, để có kích thước thật khi vẽ sheet ngồi. Sau đó vẽ mannequin (đứng 3/4 và quay lưng) và chờ người dùng duyệt tỉ lệ và mặt.
 2. Sheet đứng/đi:
-   - Khung 0 vẽ tay theo thứ tự: silhouette → mảng màu → bóng → sel-out → chi tiết → lint.
+   - Khung 0 "mặc đồ" lên mannequin: brief → 3 silhouette chọn 1 → mảng màu → bóng cel → mặt mẫu → viền tay → chi tiết → kiểm tra ở 1× và 2× trên nền sàn.
    - Khung 1: copy khung 0 rồi hạ vai 1px.
    - Khung 2–5: thử `pixel_define_rig` + `pixel_render_motion`. Nếu tay chân bị méo ở góc 3/4, vẽ tay hai khung chạm đất rồi copy thân.
    - Khung 6 vẽ tay; khung 7–8 lấy từ khung 6.
