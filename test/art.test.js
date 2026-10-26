@@ -168,7 +168,7 @@ test("palette defines pants keys and every agent's pants ramp", () => {
 });
 
 test('palette keeps the color names the code reads', () => {
-  for (const name of ['sun', 'sunGlow', 'screenOff', 'screenOn', 'screenErr', 'lampGreen', 'lampYellow', 'lampRed', 'lampGrey']) {
+  for (const name of ['sun', 'sunGlow', 'screenOff', 'screenOn', 'screenErr', 'lampGreen', 'lampYellow', 'lampRed', 'lampGrey', 'shadow']) {
     assert.ok(palette.colors[name], `colors.${name} missing`);
   }
   assert.equal(palette.colors.outline, '#3d2a22');
@@ -192,5 +192,15 @@ test('pilot agents have their own 32×64×8 character sheet with the shared char
     const m = manifest[name];
     assert.ok(m, `missing sprite "${name}"`);
     assert.deepEqual([m.w, m.h, m.frames, m.anchor], [32, 64, 8, [0, 32]], `size/anchor of "${name}"`);
+  }
+});
+
+test('character sheets leave the ground shadow to the code: no pixels below the feet', () => {
+  for (const name of ['char', ...OWN_SHEETS]) {
+    const m = manifest[name];
+    const px = pixels(readPng(new URL(m.file, ART)));
+    const w = m.w * m.frames;
+    const low = px.filter((p, i) => p.alpha && Math.floor(i / w) >= 59).length;
+    assert.equal(low, 0, `${name} has ${low} pixels in rows 59+`);
   }
 });

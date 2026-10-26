@@ -3,6 +3,7 @@ import { drawSprite, charMeta } from './sprites.js';
 import { spriteBox } from './actors.js';
 import { roomAt } from './path.js';
 import { monitorPos, deskKits } from './desks.js';
+import { staticShadows, footShadow, drawShadows } from './shadow.js';
 
 export { deskKits };
 
@@ -40,8 +41,10 @@ export function drawStatic(ctx, layout, sprites) {
       if (name) drawSprite(ctx, sprites, name, 0, x * T, y * T, { w: T, h: T });
     }
   }
-  const props = [...layout.props.filter((p) => p.decal), ...layout.props.filter((p) => !p.decal)];
-  for (const p of props) drawSprite(ctx, sprites, p.sprite, 0, p.x * T, p.y * T, { w: p.w * T, h: p.h * T });
+  const shade = sprites.palette?.colors.shadow;
+  for (const p of layout.props.filter((q) => q.decal)) drawSprite(ctx, sprites, p.sprite, 0, p.x * T, p.y * T, { w: p.w * T, h: p.h * T });
+  if (shade) drawShadows(ctx, staticShadows(layout, sprites.images, T), shade);
+  for (const p of layout.props.filter((q) => !q.decal)) drawSprite(ctx, sprites, p.sprite, 0, p.x * T, p.y * T, { w: p.w * T, h: p.h * T });
   const kits = deskKits(layout);
   layout.desks.forEach((d, i) => {
     drawSprite(ctx, sprites, d.boss ? 'deskBoss' : 'desk', 0, d.x * T, d.y * T, { w: d.w * T, h: T });
@@ -64,6 +67,8 @@ export function drawDynamic(ctx, layout, sprites, state, actors) {
     const m = monitorPos(d, T);
     drawSprite(ctx, sprites, 'monitor', monitorFrame(byDesk.get(i)), m.x, m.y, { w: T, h: T });
   });
+  const shade = sprites.palette?.colors.shadow;
+  if (shade) drawShadows(ctx, [...actors.values()].map((a) => footShadow(spriteBox(a.px, charMeta(sprites, a.view.key, T)))), shade);
   // Y-sorted: actors and chairs; a chair at the same row draws after the actor so its back covers the legs.
   const items = [
     ...layout.desks.map((d, i) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, i % 2 ? 'chair2' : 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),

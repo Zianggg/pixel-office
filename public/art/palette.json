@@ -50,7 +50,18 @@
     "lampGreen": "#7be592",
     "lampYellow": "#f8db7a",
     "lampRed": "#f06a62",
-    "lampGrey": "#b9c1c9"
+    "lampGrey": "#b9c1c9",
+    "plum1": "#7a4a4e",
+    "plum2": "#5a3444",
+    "plum3": "#3e2a3c",
+    "deep1": "#2a4a5e",
+    "deep2": "#223a4c",
+    "rose1": "#b9707a",
+    "rose2": "#8e4452",
+    "lilac1": "#c8b4b0",
+    "lilac2": "#a8949c",
+    "slate": "#6a6478",
+    "shadow": "#3e2a3c"
   },
   "keys": {
     "shirt": ["#ff00ff","#b000b0","#ff80ff"],
