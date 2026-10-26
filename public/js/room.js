@@ -53,11 +53,6 @@ export function drawStatic(ctx, layout, sprites) {
   });
 }
 
-// "x,y" seat tiles taken by an agent sitting at its desk; those chairs are part of the agent's seated sprite.
-export function occupiedSeats(actors) {
-  return new Set([...actors].filter((a) => a.seatedAtDesk).map((a) => `${a.x},${a.y}`));
-}
-
 function monitorFrame(agent) {
   if (!agent) return MONITOR.off;
   if (agent.status === 'error') return MONITOR.err;
@@ -76,12 +71,10 @@ export function drawDynamic(ctx, layout, sprites, state, actors) {
   const boxOf = (a) => spriteBox(a.px, actorMeta(sprites, a.view.key, a.sprite.sheet, T));
   const standing = [...actors.values()].filter((a) => !a.seatedAtDesk);
   if (shade) drawShadows(ctx, standing.map((a) => footShadow(boxOf(a))), shade);
-  const taken = occupiedSeats(actors.values());
-  // Y-sorted: actors and chairs; a chair at the same row draws after the actor so its back covers the legs.
+  // Y-sorted: actors and chairs; a chair at the same row draws after the actor (seated or passing),
+  // so its back covers the legs. Seated sheets hold only the character, never the chair.
   const items = [
-    ...layout.desks
-      .filter((d) => !taken.has(`${d.seat[0]},${d.seat[1]}`))
-      .map((d) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, d.boss ? 'chairBoss' : 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),
+    ...layout.desks.map((d) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, d.boss ? 'chairBoss' : 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),
     ...[...actors.values()].map((a) => ({
       y: a.px.y,
       draw: () => {

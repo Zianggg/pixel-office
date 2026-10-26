@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { deskKits, tileAt, occupiedSeats } from '../public/js/room.js';
+import { deskKits, tileAt, drawDynamic } from '../public/js/room.js';
 
 const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
 
@@ -31,7 +31,24 @@ test('tileAt names wall, trim, floor, divider and doorway tiles', () => {
   assert.equal(tileAt(l, 99, 0), null);
 });
 
-test('occupiedSeats lists only actors seated at a desk', () => {
-  const actors = new Map([['a', { seatedAtDesk: true, x: 8, y: 7 }], ['b', { seatedAtDesk: false, x: 12, y: 7 }]]);
-  assert.deepEqual(occupiedSeats(actors.values()), new Set(['8,7']));
+
+// Records which sprite canvas each drawImage call used, in draw order.
+function recordingCtx() {
+  const drawn = [];
+  const noop = () => {};
+  return { drawn, save: noop, restore: noop, translate: noop, scale: noop, fillRect: noop, strokeRect: noop, beginPath: noop, ellipse: noop, fill: noop,
+    drawImage: (canvas, sx, sy, sw, sh, dx, dy) => drawn.push({ name: canvas.name, dx, dy }) };
+}
+const img = (name, w, h, frames = 1, anchor = [0, 0]) => ({ canvas: { name }, w, h, frames, anchor });
+
+test('a seated agent keeps its desk chair, drawn over it so the chair back covers the body', () => {
+  const T = layout.tile;
+  const desk = layout.desks[1];
+  const sprites = { images: { chair: img('chair', 32, 32), chairBoss: img('chairBoss', 32, 32), monitor: img('monitor', 32, 32, 3), 'sit:a': img('sit:a', 64, 64, 8, [16, 32]) }, palette: { colors: {} } };
+  const actor = { seatedAtDesk: true, x: desk.seat[0], y: desk.seat[1], px: { x: desk.seat[0] * T, y: desk.seat[1] * T }, view: { key: 'a' }, sprite: { sheet: 'sit', frame: 0, flip: false } };
+  const ctx = recordingCtx();
+  drawDynamic(ctx, layout, sprites, { agents: {} }, new Map([['a', actor]]));
+  const at = ctx.drawn.findIndex((d) => d.name === 'chair' && d.dx === desk.seat[0] * T && d.dy === desk.seat[1] * T);
+  assert.ok(at >= 0, 'the occupied desk chair is drawn');
+  assert.ok(at > ctx.drawn.findIndex((d) => d.name === 'sit:a'), 'the chair is drawn after the seated agent');
 });
