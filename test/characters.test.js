@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs';
 import { readPng, frameMask, rowsWithPixels, iou, colorsOf } from './png.js';
 
 const ART = new URL('../public/art/', import.meta.url);
-const FIX = new URL('./fixtures/', import.meta.url);
 const palette = JSON.parse(readFileSync(new URL('palette.json', ART), 'utf8'));
 const allowed = new Set(Object.values(palette.colors).map((c) => c.toLowerCase()));
 
@@ -14,7 +13,7 @@ const SIZE = { char: [32, 64, 9, [0, 32]], sit: [64, 64, 8, [16, 32]] };
 
 // Every character sheet in a manifest that has at least one opaque pixel, grouped per character:
 // 'char'/'sit' is the guest, 'char_<kit>'/'sit_<kit>' an agent's own sheets.
-function sheetsIn(dir, fixture) {
+function sheetsIn(dir) {
   const manifest = JSON.parse(readFileSync(new URL('manifest.json', dir), 'utf8'));
   const out = [];
   for (const [name, meta] of Object.entries(manifest)) {
@@ -22,15 +21,15 @@ function sheetsIn(dir, fixture) {
     if (!m) continue;
     const png = readPng(new URL(meta.file, dir));
     if (!png.rgba.some((v, i) => i % 4 === 3 && v === 255)) continue;
-    out.push({ name, base: m[1], who: m[2] ?? 'guest', meta, png, fixture });
+    out.push({ name, base: m[1], who: m[2] ?? 'guest', meta, png });
   }
   return out;
 }
 
-const sheets = [...sheetsIn(ART, false), ...sheetsIn(FIX, true)];
+const sheets = sheetsIn(ART);
 const characters = new Map();
 for (const s of sheets) {
-  const c = characters.get(s.who) ?? { who: s.who, fixture: s.fixture };
+  const c = characters.get(s.who) ?? { who: s.who };
   c[s.base] = s;
   characters.set(s.who, c);
 }
@@ -38,8 +37,12 @@ const charSheets = sheets.filter((s) => s.base === 'char');
 const sitSheets = sheets.filter((s) => s.base === 'sit');
 const rows = (s, frame) => rowsWithPixels(frameMask(s.png, frame, s.meta.w, s.meta.h), s.meta.w, s.meta.h);
 
-test('the fixture character is always checked, so these tests never run empty', () => {
-  assert.ok(characters.get('fixture')?.char && characters.get('fixture')?.sit);
+test('all 10 characters are present: each agent kit and the guest have char and sit sheets with pixels', () => {
+  const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
+  const who = [...layout.agents.map((a) => a.kit), 'guest'];
+  assert.equal(who.length, 10);
+  const missing = who.flatMap((w) => ['char', 'sit'].filter((b) => !characters.get(w)?.[b]).map((b) => `${b} of ${w}`));
+  assert.deepEqual(missing, []);
 });
 
 test('char sheets are 32×64 × 9, anchor [0,32]; sit sheets 64×64 × 8, anchor [16,32]', () => {
@@ -95,10 +98,8 @@ test('each character uses at most 16 palette colors', () => {
   }
 });
 
-test('idle silhouettes differ: IoU < 0.85 for every pair', (t) => {
-  // The fixture is a test stand-in, not a character in the office.
-  const real = [...characters.values()].filter((c) => c.char && !c.fixture);
-  if (real.length < 2) return t.skip(`only ${real.length} character(s) drawn`);
+test('idle silhouettes differ: IoU < 0.85 for every pair', () => {
+  const real = [...characters.values()].filter((c) => c.char);
   const masks = real.map((c) => [c.who, frameMask(c.char.png, CHAR.idle1, 32, 64)]);
   for (let i = 0; i < masks.length; i++) {
     for (let j = i + 1; j < masks.length; j++) {
