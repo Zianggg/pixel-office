@@ -37,6 +37,36 @@ const charSheets = sheets.filter((s) => s.base === 'char');
 const sitSheets = sheets.filter((s) => s.base === 'sit');
 const rows = (s, frame) => rowsWithPixels(frameMask(s.png, frame, s.meta.w, s.meta.h), s.meta.w, s.meta.h);
 
+// The largest 4-connected blob of a mask: the character's body, without desk props drawn apart from it.
+function largestBlob(mask, w, h) {
+  const seen = new Uint8Array(mask.length);
+  let best = [];
+  for (let start = 0; start < mask.length; start++) {
+    if (!mask[start] || seen[start]) continue;
+    const blob = [start];
+    seen[start] = 1;
+    for (let k = 0; k < blob.length; k++) {
+      const i = blob[k];
+      const x = i % w;
+      const next = [x > 0 && i - 1, x < w - 1 && i + 1, i >= w && i - w, i + w < w * h && i + w];
+      for (const j of next) {
+        if (j !== false && mask[j] && !seen[j]) {
+          seen[j] = 1;
+          blob.push(j);
+        }
+      }
+    }
+    if (blob.length > best.length) best = blob;
+  }
+  const out = new Uint8Array(mask.length);
+  for (const i of best) out[i] = 1;
+  return out;
+}
+const bodyRows = (s, frame) => {
+  const { w, h } = s.meta;
+  return rowsWithPixels(largestBlob(frameMask(s.png, frame, w, h), w, h), w, h);
+};
+
 test('all 10 characters are present: each agent kit and the guest have char and sit sheets with pixels', () => {
   const layout = JSON.parse(readFileSync(new URL('../public/layout.json', import.meta.url), 'utf8'));
   const who = [...layout.agents.map((a) => a.kit), 'guest'];
@@ -84,7 +114,8 @@ test('walking frames keep feet on the ground', () => {
 
 test('seated typing keeps the head still', () => {
   for (const s of sitSheets) {
-    const tops = ['type1', 'type2', 'type3', 'type4'].map((f) => rows(s, SIT[f]).top);
+    // Measured on the body: a desk prop in row 0 would otherwise hide any head movement.
+    const tops = ['type1', 'type2', 'type3', 'type4'].map((f) => bodyRows(s, SIT[f]).top);
     assert.ok(tops.every((t) => t === tops[0] && t >= 0), `${s.name} head rows ${tops.join(',')}`);
   }
 });

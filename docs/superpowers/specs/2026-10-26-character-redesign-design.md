@@ -1,7 +1,7 @@
 # Làm lại nhân vật: concept vector → pixel 32×64
 
 - Ngày: 2026-10-26
-- Trạng thái: Thiết kế đã duyệt trong chat, chờ duyệt spec
+- Trạng thái: Đã làm xong trên `feat/characters-v4` (Task 0–9 của plan `2026-10-26-character-redesign.md`); chờ người dùng quyết định merge
 - Branch: `feat/characters-v4` (tách từ `feat/retro-rooms`, nơi có bản đồ ô 32 px)
 - Thay thế hoàn toàn: `docs/superpowers/specs/2026-10-26-hibit-characters-design.md`, `docs/superpowers/plans/2026-10-26-hibit-characters.md` và 5 tài liệu trong `docs/research/`.
 
@@ -104,7 +104,7 @@ Sắc da, màu tóc và màu trang phục chốt trên tờ concept; 10 nhân v�
 
 - `idle*`, `walk*`: 3/4 trước, mặt hướng xuống-phải (đi trái = lật ngang, engine tự làm).
 - `back`, `walkBack*`: 3/4 sau.
-- `sit*`: nhìn từ sau lưng, ngồi trên ghế văn phòng (ghế vẽ trong sheet). `type*` đổi tay gõ; `wait*` tay rời bàn phím, đầu ngẩng; `error*` tay ôm đầu / người ngả ra.
+- `sit*`: nhìn từ sau lưng, ngồi trên ghế văn phòng. Sheet chỉ chứa nhân vật; engine vẽ ghế của bàn đè lên sau nhân vật đang ngồi để lưng ghế che phần thân dưới (ruling Task 4: ghế trong sheet làm vượt giới hạn 16 màu). `type*` đổi tay gõ; `wait*` tay rời bàn phím, đầu ngẩng; `error*` tay ôm đầu / người ngả ra.
 - Nhân vật khách dùng tên chung `char.png` / `sit.png` (engine tự rơi về tên chung khi agent không có `kit`).
 - Các khung xếp ngang trong một PNG, nền trong suốt.
 
