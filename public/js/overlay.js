@@ -1,5 +1,6 @@
 // High-resolution overlay: status lamps, tool badges, name tags and speech bubbles.
-import { drawSprite } from './sprites.js';
+import { drawSprite, actorMeta } from './sprites.js';
+import { spriteBox } from './actors.js';
 import { lampGlowColor } from './glow.js';
 
 const BUBBLE_MS = 8000;
@@ -104,8 +105,10 @@ export function drawOverlay(ctx, s, actors, state, now, sprites, bubbles, k = 1)
   for (const actor of sorted) {
     const view = state.agents[actor.view.key];
     if (!view) continue;
-    const cx = (actor.px.x + 8 * k) * s;
-    const head = (actor.px.y - 8 * k) * s;
+    const box = spriteBox(actor.px, actorMeta(sprites, actor.view.key, actor.sprite.sheet, 16 * k));
+    const cx = (box.x + box.w / 2) * s;
+    const head = box.y * s;
+    const feet = (box.y + box.h) * s;
     const glow = sprites.palette && lampGlowColor(view.status, sprites.palette);
     if (glow) drawLampGlow(ctx, cx, head - 4 * u, 7 * u, glow);
     drawSprite(ctx, sprites, 'lamp', LAMP[view.status] ?? 3, cx - 3 * u, head - 7 * u, { scale: s, w: 6 * k, h: 6 * k });
@@ -116,9 +119,9 @@ export function drawOverlay(ctx, s, actors, state, now, sprites, bubbles, k = 1)
     ctx.textBaseline = 'top';
     ctx.lineWidth = Math.max(2, u / 1.5);
     ctx.strokeStyle = 'rgba(43,29,20,0.85)';
-    ctx.strokeText(view.name, cx, (actor.px.y + 16 * k) * s);
+    ctx.strokeText(view.name, cx, feet);
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(view.name, cx, (actor.px.y + 16 * k) * s);
+    ctx.fillText(view.name, cx, feet);
     ctx.textAlign = 'left';
     const b = bubbles.get(view.key);
     if (b && BUBBLE_STATUSES.has(view.status) && now - b.since < BUBBLE_MS && b.text) {

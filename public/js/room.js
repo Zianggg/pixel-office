@@ -1,23 +1,50 @@
 // Draws the office: static background once, then per-frame desks, chairs and actors.
-import { drawSprite } from './sprites.js';
+import { drawSprite, actorMeta } from './sprites.js';
+import { spriteBox } from './actors.js';
+import { roomAt } from './path.js';
 import { monitorPos, deskKits } from './desks.js';
+import { staticShadows, footShadow, drawShadows } from './shadow.js';
 
 export { deskKits };
 
 const MONITOR = { off: 0, on: 1, err: 2 };
 
+// Wall sprite for row y of room r, or null when y is below its wall rows.
+function wallTile(r, y) {
+  const ly = y - r.y;
+  if (ly >= r.wallRows) return null;
+  return ly === r.wallRows - 1 ? `${r.wall}Trim` : r.wall;
+}
+
+// Background sprite name of tile (x, y): a room's wall or floor, a divider top or doorway, or null off the map.
+export function tileAt(layout, x, y) {
+  const r = roomAt(layout, x, y);
+  if (r) {
+    const wall = wallTile(r, y);
+    if (wall) return wall;
+    return r.floor.length > 1 && (x * 7 + y * 3) % 5 === 0 ? r.floor[1] : r.floor[0];
+  }
+  const d = (layout.dividers ?? []).find((v) => v.x === x && y >= v.y && y < v.y + v.h);
+  if (!d) return null;
+  if (d.doors.includes(y)) return 'doorway';
+  const left = roomAt(layout, x - 1, y);
+  return (left && wallTile(left, y)) ?? 'divider';
+}
+
 export function drawStatic(ctx, layout, sprites) {
   const T = layout.tile;
   const k = T / 16;
-  const wallRows = layout.wallRows ?? 2;
   ctx.imageSmoothingEnabled = false;
   for (let y = 0; y < layout.rows; y++) {
     for (let x = 0; x < layout.cols; x++) {
-      if (y < wallRows) drawSprite(ctx, sprites, y === wallRows - 1 ? 'wallTrim' : 'wall', 0, x * T, y * T, { w: T, h: T });
-      else drawSprite(ctx, sprites, (x * 7 + y * 3) % 5 === 0 ? 'floor2' : 'floor', 0, x * T, y * T, { w: T, h: T });
+      const name = tileAt(layout, x, y);
+      if (name) drawSprite(ctx, sprites, name, 0, x * T, y * T, { w: T, h: T });
     }
   }
-  for (const p of layout.props) drawSprite(ctx, sprites, p.sprite, 0, p.x * T, p.y * T, { w: p.w * T, h: p.h * T });
+  const shade = sprites.palette?.colors.shadow;
+  for (const p of layout.props.filter((q) => q.decal)) drawSprite(ctx, sprites, p.sprite, 0, p.x * T, p.y * T, { w: p.w * T, h: p.h * T });
+  if (shade) drawShadows(ctx, staticShadows(layout, sprites.images, T), shade);
+  for (const p of layout.props.filter((q) => !q.decal)) drawSprite(ctx, sprites, p.sprite, 0, p.x * T, p.y * T, { w: p.w * T, h: p.h * T });
   const kits = deskKits(layout);
   layout.desks.forEach((d, i) => {
     drawSprite(ctx, sprites, d.boss ? 'deskBoss' : 'desk', 0, d.x * T, d.y * T, { w: d.w * T, h: T });
@@ -40,12 +67,21 @@ export function drawDynamic(ctx, layout, sprites, state, actors) {
     const m = monitorPos(d, T);
     drawSprite(ctx, sprites, 'monitor', monitorFrame(byDesk.get(i)), m.x, m.y, { w: T, h: T });
   });
-  // Y-sorted: actors and chairs; a chair at the same row draws after the actor so its back covers the legs.
+  const shade = sprites.palette?.colors.shadow;
+  const boxOf = (a) => spriteBox(a.px, actorMeta(sprites, a.view.key, a.sprite.sheet, T));
+  const standing = [...actors.values()].filter((a) => !a.seatedAtDesk);
+  if (shade) drawShadows(ctx, standing.map((a) => footShadow(boxOf(a))), shade);
+  // Y-sorted: actors and chairs; a chair at the same row draws after the actor (seated or passing),
+  // so its back covers the legs. Seated sheets hold only the character, never the chair.
   const items = [
-    ...layout.desks.map((d) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),
+    ...layout.desks.map((d) => ({ y: d.seat[1] * T + 0.5, draw: () => drawSprite(ctx, sprites, d.boss ? 'chairBoss' : 'chair', 0, d.seat[0] * T, d.seat[1] * T, { w: T, h: T }) })),
     ...[...actors.values()].map((a) => ({
       y: a.px.y,
-      draw: () => drawSprite(ctx, sprites, `char:${a.view.key}`, a.frame, a.px.x, a.px.y - T / 2, { flip: a.flip, w: T, h: T * 1.5 }),
+      draw: () => {
+        const s = a.sprite;
+        const b = boxOf(a);
+        drawSprite(ctx, sprites, `${s.sheet}:${a.view.key}`, s.frame, b.x, b.y, { flip: s.flip, w: b.w, h: b.h });
+      },
     })),
   ];
   items.sort((a, b) => a.y - b.y).forEach((it) => it.draw());

@@ -1,21 +1,23 @@
 // Light pass: sunlight through the windows, screen glow, pc LEDs. Pure source math + a banded additive renderer.
 // Offsets are authored for 16px tiles; k = tile / 16 scales them.
 import { monitorPos, deskKits } from './desks.js';
+import { roomAt } from './path.js';
 
 export { monitorPos };
 
 const LIT = new Set(['working', 'waiting']);
 
 function windows(layout) {
-  return layout.props.filter((p) => p.sprite === 'window');
+  return layout.props.filter((p) => p.sprite.startsWith('window'));
 }
 
-// One short beam per window: from the glass width at the floor line, slanting a little down-right.
+// One short beam per window: from the glass width at its room's floor line, slanting a little down-right.
 export function sunBeams(layout, palette) {
   const T = layout.tile;
   const k = T / 16;
-  const floor = (layout.wallRows ?? 2) * T;
   return windows(layout).map((w) => {
+    const r = roomAt(layout, w.x, w.y);
+    const floor = (r.y + r.wallRows) * T;
     const left = w.x * T + 6 * k;
     const right = (w.x + w.w) * T - 6 * k;
     return {
