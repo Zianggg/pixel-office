@@ -6,6 +6,7 @@ import net from 'node:net';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { officeCommand, parseArgs, withProject } from '../cli.js';
 
 const cli = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'cli.js');
 const tmp = () => mkdtempSync(path.join(tmpdir(), 'office-cli-'));
@@ -14,8 +15,9 @@ const freePort = () => new Promise((resolve) => {
 });
 const runCli = (args, port, dataDir) => spawnSync(process.execPath, [cli, ...args], {
   encoding: 'utf8', timeout: 20000,
-  env: { ...process.env, OFFICE_PORT: String(port), OFFICE_DATA: dataDir, OFFICE_NO_BROWSER: '1' },
+  env: { ...process.env, CLAUDE_PROJECT_DIR: '', OFFICE_PORT: String(port), OFFICE_DATA: dataDir, OFFICE_NO_BROWSER: '1' },
 });
+const repoParent = path.resolve(path.dirname(cli), '..', '..');
 
 test('on refuses when the port is taken by something else and leaves settings alone', async () => {
   const blocker = net.createServer().listen(0, '127.0.0.1');
@@ -110,4 +112,63 @@ test('unknown command prints usage and exits 2', () => {
   const r = runCli(['dance'], 1, tmp());
   assert.equal(r.status, 2);
   assert.match(r.stdout + r.stderr, /office on\|off\|status\|demo/);
+});
+
+test('project defaults to two folders above cli.js, then $CLAUDE_PROJECT_DIR, then --project', () => {
+  const other = tmp();
+  assert.equal(parseArgs(['status'], {}).project, repoParent);
+  assert.equal(parseArgs(['status'], { CLAUDE_PROJECT_DIR: other }).project, other);
+  assert.equal(parseArgs(['status', '--project', other], { CLAUDE_PROJECT_DIR: tmp() }).project, other);
+  assert.equal(parseArgs(['install', '--force'], {}).force, true);
+});
+
+test('status without --project reports the folder two levels above cli.js', async () => {
+  const r = runCli(['status'], await freePort(), tmp());
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.ok(r.stdout.includes(`Project: ${repoParent}`), r.stdout);
+});
+
+test('a project folder that does not exist is refused and nothing is created', async () => {
+  const project = path.join(tmp(), 'missing');
+  const r = runCli(['on', '--project', project], await freePort(), tmp());
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /Không thấy thư mục project/);
+  assert.equal(existsSync(project), false);
+});
+
+test('install copies /office with a project-relative cli path, keeps an identical copy, refuses to overwrite without --force', async () => {
+  const port = await freePort();
+  const project = tmp();
+  const dest = path.join(project, '.claude', 'commands', 'office.md');
+
+  const first = runCli(['install', '--project', project], port, tmp());
+  assert.equal(first.status, 0, first.stdout + first.stderr);
+  const text = readFileSync(dest, 'utf8');
+  assert.equal(text, officeCommand(project));
+  assert.doesNotMatch(text, /\{\{CLI\}\}/);
+  const cliRel = path.relative(project, cli).split(path.sep).join('/');
+  assert.ok(text.includes(`node "${cliRel}" $ARGUMENTS`), text);
+
+  const again = runCli(['install', '--project', project], port, tmp());
+  assert.equal(again.status, 0);
+  assert.match(again.stdout, /đã có sẵn/);
+
+  writeFileSync(dest, 'của tôi');
+  const refused = runCli(['install', '--project', project], port, tmp());
+  assert.equal(refused.status, 1);
+  assert.equal(readFileSync(dest, 'utf8'), 'của tôi');
+
+  const forced = runCli(['install', '--project', project, '--force'], port, tmp());
+  assert.equal(forced.status, 0, forced.stdout + forced.stderr);
+  assert.equal(readFileSync(dest, 'utf8'), text);
+});
+
+test('the demo scenario has no hard-coded project and {{PROJECT}} is filled in everywhere', () => {
+  const raw = readFileSync(path.join(path.dirname(cli), 'demo', 'scenario.json'), 'utf8');
+  assert.doesNotMatch(raw, /UnityProject/);
+  const project = String.raw`D:\Work\Game`;
+  const filled = withProject(JSON.parse(raw), project);
+  assert.doesNotMatch(JSON.stringify(filled), /\{\{PROJECT\}\}/);
+  assert.equal(filled[0].payload.cwd, project);
+  assert.equal(filled[0].payload.tool_input.file_path, String.raw`D:\Work\Game\CLAUDE.md`);
 });

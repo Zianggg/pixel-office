@@ -3,11 +3,11 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\CLAUDE.md"
+    "file_path": "{{PROJECT}}\\CLAUDE.md"
    },
    "tool_use_id": "toolu_demo_1"
   }
@@ -16,11 +16,11 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\CLAUDE.md"
+    "file_path": "{{PROJECT}}\\CLAUDE.md"
    },
    "tool_use_id": "toolu_demo_1",
    "tool_response": {}
@@ -30,7 +30,7 @@
   "delayMs": 1080,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "tool_name": "Agent",
    "tool_input": {
@@ -44,7 +44,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "tool_name": "Agent",
    "tool_input": {
@@ -59,7 +59,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "d1",
    "agent_type": "unity-game-designer"
@@ -69,13 +69,13 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "d1",
    "agent_type": "unity-game-designer",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\idea.md"
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\idea.md"
    },
    "tool_use_id": "toolu_demo_3"
   }
@@ -84,13 +84,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "d1",
    "agent_type": "unity-game-designer",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\idea.md"
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\idea.md"
    },
    "tool_use_id": "toolu_demo_3",
    "tool_response": {}
@@ -100,13 +100,13 @@
   "delayMs": 1260,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "d1",
    "agent_type": "unity-game-designer",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\GDD.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\GDD.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_4"
@@ -116,13 +116,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "d1",
    "agent_type": "unity-game-designer",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\GDD.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\GDD.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_4",
@@ -133,7 +133,7 @@
   "delayMs": 540,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect"
@@ -143,13 +143,13 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\GDD.md"
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\GDD.md"
    },
    "tool_use_id": "toolu_demo_5"
   }
@@ -158,13 +158,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\GDD.md"
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\GDD.md"
    },
    "tool_use_id": "toolu_demo_5",
    "tool_response": {}
@@ -174,7 +174,7 @@
   "delayMs": 1080,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "d1",
    "agent_type": "unity-game-designer",
@@ -185,13 +185,13 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\TECH.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\TECH.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_6"
@@ -201,13 +201,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\TECH.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\TECH.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_6",
@@ -218,7 +218,7 @@
   "delayMs": 540,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "s1",
    "agent_type": "unity-project-setup"
@@ -228,7 +228,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "s1",
    "agent_type": "unity-project-setup",
@@ -244,7 +244,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "s1",
    "agent_type": "unity-project-setup",
@@ -261,13 +261,13 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\BACKLOG.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\BACKLOG.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_8"
@@ -277,13 +277,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\BACKLOG.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\BACKLOG.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_8",
@@ -294,7 +294,7 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "t1",
    "agent_type": "unity-tech-architect",
@@ -305,7 +305,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "s1",
    "agent_type": "unity-project-setup",
@@ -321,7 +321,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "s1",
    "agent_type": "unity-project-setup",
@@ -338,7 +338,7 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "s1",
    "agent_type": "unity-project-setup",
@@ -349,7 +349,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer"
@@ -359,7 +359,7 @@
   "delayMs": 360,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "p2",
    "agent_type": "unity-gameplay-programmer"
@@ -369,7 +369,7 @@
   "delayMs": 540,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder"
@@ -379,13 +379,13 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_10"
@@ -395,13 +395,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_10",
@@ -412,13 +412,13 @@
   "delayMs": 540,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "p2",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_11"
@@ -428,13 +428,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "p2",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_11",
@@ -445,7 +445,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -460,7 +460,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -476,7 +476,7 @@
   "delayMs": 1080,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "Notification",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -488,7 +488,7 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
@@ -504,7 +504,7 @@
   "delayMs": 2700,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUseFailure",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
@@ -521,13 +521,13 @@
   "delayMs": 2160,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Edit",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
     "old_string": "a",
     "new_string": "b"
    },
@@ -538,13 +538,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Edit",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs",
     "old_string": "a",
     "new_string": "b"
    },
@@ -556,7 +556,7 @@
   "delayMs": 5400,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -572,7 +572,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -589,13 +589,13 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "p2",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Edit",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
     "old_string": "a",
     "new_string": "b"
    },
@@ -606,13 +606,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "p2",
    "agent_type": "unity-gameplay-programmer",
    "tool_name": "Edit",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\EnemyAI.cs",
     "old_string": "a",
     "new_string": "b"
    },
@@ -624,7 +624,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
@@ -640,7 +640,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
@@ -657,7 +657,7 @@
   "delayMs": 540,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "h1",
    "agent_type": "art-helper"
@@ -667,7 +667,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "h1",
    "agent_type": "art-helper",
@@ -682,7 +682,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "h1",
    "agent_type": "art-helper",
@@ -698,7 +698,7 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "p2",
    "agent_type": "unity-gameplay-programmer",
@@ -709,7 +709,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -724,7 +724,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -740,7 +740,7 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "p1",
    "agent_type": "unity-gameplay-programmer",
@@ -751,7 +751,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "h1",
    "agent_type": "art-helper",
@@ -762,7 +762,7 @@
   "delayMs": 540,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "q1",
    "agent_type": "unity-qa-tester"
@@ -772,7 +772,7 @@
   "delayMs": 360,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "r1",
    "agent_type": "unity-code-reviewer"
@@ -782,13 +782,13 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "r1",
    "agent_type": "unity-code-reviewer",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs"
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs"
    },
    "tool_use_id": "toolu_demo_20"
   }
@@ -797,13 +797,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "r1",
    "agent_type": "unity-code-reviewer",
    "tool_name": "Read",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs"
+    "file_path": "{{PROJECT}}\\DemoGame\\Assets\\_Game\\Scripts\\Runtime\\PlayerController.cs"
    },
    "tool_use_id": "toolu_demo_20",
    "tool_response": {}
@@ -813,7 +813,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "q1",
    "agent_type": "unity-qa-tester",
@@ -829,7 +829,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "q1",
    "agent_type": "unity-qa-tester",
@@ -846,7 +846,7 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "b1",
    "agent_type": "unity-scene-builder",
@@ -857,7 +857,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "r1",
    "agent_type": "unity-code-reviewer",
@@ -872,7 +872,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "r1",
    "agent_type": "unity-code-reviewer",
@@ -888,13 +888,13 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "q1",
    "agent_type": "unity-qa-tester",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\QA_REPORT.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\QA_REPORT.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_23"
@@ -904,13 +904,13 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "q1",
    "agent_type": "unity-qa-tester",
    "tool_name": "Write",
    "tool_input": {
-    "file_path": "E:\\UnityProject\\DemoGame\\docs\\QA_REPORT.md",
+    "file_path": "{{PROJECT}}\\DemoGame\\docs\\QA_REPORT.md",
     "content": "..."
    },
    "tool_use_id": "toolu_demo_23",
@@ -921,7 +921,7 @@
   "delayMs": 900,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "r1",
    "agent_type": "unity-code-reviewer",
@@ -932,7 +932,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "q1",
    "agent_type": "unity-qa-tester",
@@ -943,7 +943,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStart",
    "agent_id": "e1",
    "agent_type": "unity-build-engineer"
@@ -953,7 +953,7 @@
   "delayMs": 720,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PreToolUse",
    "agent_id": "e1",
    "agent_type": "unity-build-engineer",
@@ -969,7 +969,7 @@
   "delayMs": 1620,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "PostToolUse",
    "agent_id": "e1",
    "agent_type": "unity-build-engineer",
@@ -986,7 +986,7 @@
   "delayMs": 4500,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "SubagentStop",
    "agent_id": "e1",
    "agent_type": "unity-build-engineer",
@@ -997,7 +997,7 @@
   "delayMs": 1440,
   "payload": {
    "session_id": "demo",
-   "cwd": "E:\\UnityProject",
+   "cwd": "{{PROJECT}}",
    "hook_event_name": "Stop"
   }
  }

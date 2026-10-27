@@ -188,7 +188,7 @@ if (isMain) {
     dataDir: process.env.OFFICE_DATA || path.join(here, 'data'),
     publicDir,
     layout: JSON.parse(readFileSync(path.join(publicDir, 'layout.json'), 'utf8')),
-    projectDir: process.env.OFFICE_PROJECT || 'E:\\UnityProject',
+    projectDir: process.env.OFFICE_PROJECT || path.resolve(here, '..', '..'),
     port: Number(process.env.OFFICE_PORT || 4848),
     debugRaw: process.env.OFFICE_DEBUG === '1',
   });
