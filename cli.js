@@ -1,9 +1,9 @@
-// office on|off|status|demo — turns the Pixel Office hooks and server on or off.
+// office on|off|status|demo|install — turns the Pixel Office hooks and server on or off.
 import { spawn } from 'node:child_process';
-import { readdirSync, readFileSync, rmdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { addOfficeHooks, hasOfficeHooks, readSettings, removeOfficeHooks, writeSettings } from './lib/hooks-config.js';
 import { hookUrl, settingsFile } from './server.js';
 
@@ -13,13 +13,22 @@ const port = Number(env.OFFICE_PORT || 4848);
 const dataDir = env.OFFICE_DATA || path.join(here, 'data');
 const base = `http://127.0.0.1:${port}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const USAGE = 'Cách dùng: office on|off|status|demo [--project <thư mục project>]';
+const USAGE = 'Cách dùng: office on|off|status|demo|install [--project <thư mục project>] [--force]';
 
-function parseArgs(argv) {
-  const out = { cmd: argv[0], project: 'E:\\UnityProject' };
+// Project = --project, else $CLAUDE_PROJECT_DIR, else two levels up (the repo lives at <project>/tools/pixel-office).
+export function parseArgs(argv, { CLAUDE_PROJECT_DIR } = env) {
+  const out = { cmd: argv[0], project: CLAUDE_PROJECT_DIR || path.resolve(here, '..', '..'), force: argv.includes('--force') };
   const i = argv.indexOf('--project');
   if (i !== -1 && argv[i + 1]) out.project = argv[i + 1];
+  out.project = path.resolve(out.project);
   return out;
+}
+
+function requireProject(project) {
+  if (!existsSync(project) || !statSync(project).isDirectory()) {
+    console.error(`✗ Không thấy thư mục project: ${project} — truyền đúng --project <thư mục>`);
+    process.exit(1);
+  }
 }
 
 async function probe() {
@@ -54,7 +63,11 @@ async function startServer(project, dir = dataDir) {
 
 function openBrowser() {
   if (env.OFFICE_NO_BROWSER) return false;
-  spawn('cmd', ['/c', 'start', '""', base], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
+  const [cmd, args] = { win32: ['cmd', ['/c', 'start', '""', base]], darwin: ['open', [base]] }[process.platform]
+    ?? ['xdg-open', [base]];
+  const child = spawn(cmd, args, { detached: true, stdio: 'ignore', windowsHide: true });
+  child.on('error', () => console.log(`⚠ Không tự mở được trình duyệt — mở tay: ${base}`));
+  child.unref();
   return true;
 }
 
@@ -111,6 +124,7 @@ async function off(project) {
 async function status(project) {
   const hooks = hasOfficeHooks(loadSettings(settingsFile(project)), hookUrl(port));
   const srv = await probe();
+  console.log(`Project: ${project}`);
   console.log(`Hook: ${hooks ? 'BẬT' : 'TẮT'} · Server: ${srv ? 'đang chạy' : 'tắt'} · Sự kiện đã nhận: ${srv ? srv.events : 0}`);
   if (hooks && !srv) {
     console.log('⚠ Hook còn bật mà server đã tắt: Claude vẫn chạy bình thường nhưng mỗi tool call hiện dòng "hook error" — chạy office on để bật lại server, hoặc office off để gỡ hook');
@@ -129,7 +143,7 @@ async function demo(project) {
     }
   }
   openBrowser();
-  const scenario = JSON.parse(readFileSync(path.join(here, 'demo', 'scenario.json'), 'utf8'));
+  const scenario = withProject(JSON.parse(readFileSync(path.join(here, 'demo', 'scenario.json'), 'utf8')), project);
   console.log(`▶ Đang phát ${scenario.length} sự kiện demo tại ${base} …`);
   for (const step of scenario) {
     await sleep(step.delayMs ?? 0);
@@ -138,10 +152,48 @@ async function demo(project) {
   console.log('✓ Demo xong. Tắt server bằng: office off');
 }
 
-const { cmd, project } = parseArgs(process.argv.slice(2));
-const commands = { on, off, status, demo };
-if (!commands[cmd]) {
-  console.error(USAGE);
-  process.exit(2);
+// Swaps every {{PROJECT}} in the scenario's strings for the real project folder.
+export function withProject(value, project) {
+  if (typeof value === 'string') return value.replaceAll('{{PROJECT}}', project);
+  if (Array.isArray(value)) return value.map((v) => withProject(v, project));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, withProject(v, project)]));
+  }
+  return value;
 }
-await commands[cmd](project);
+
+// The /office slash command for a project, calling this cli.js by its path relative to the project root.
+export function officeCommand(project) {
+  const cli = path.relative(project, path.join(here, 'cli.js')).split(path.sep).join('/');
+  return readFileSync(path.join(here, 'claude', 'commands', 'office.md'), 'utf8').replaceAll('{{CLI}}', cli);
+}
+
+async function install(project, { force }) {
+  const text = officeCommand(project);
+  const dest = path.join(project, '.claude', 'commands', 'office.md');
+  if (existsSync(dest)) {
+    if (readFileSync(dest, 'utf8') === text) {
+      console.log(`✓ Lệnh /office đã có sẵn ở ${dest}`);
+      return;
+    }
+    if (!force) {
+      console.error(`✗ ${dest} đã có và khác bản trong repo — chạy lại với --force để ghi đè`);
+      process.exit(1);
+    }
+  }
+  mkdirSync(path.dirname(dest), { recursive: true });
+  writeFileSync(dest, text);
+  console.log(`✓ Đã cài lệnh /office vào ${dest}`);
+}
+
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+if (isMain) {
+  const { cmd, project, force } = parseArgs(process.argv.slice(2));
+  const commands = { on, off, status, demo, install };
+  if (!commands[cmd]) {
+    console.error(USAGE);
+    process.exit(2);
+  }
+  requireProject(project);
+  await commands[cmd](project, { force });
+}

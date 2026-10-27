@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "SubagentStart": [
+      { "hooks": [{ "type": "http", "url": "http://127.0.0.1:4848/hook", "timeout": 2 }] }
+    ],
+    "PreToolUse": [
+      { "hooks": [{ "type": "http", "url": "http://127.0.0.1:4848/hook", "timeout": 2 }] }
+    ],
+    "PostToolUse": [
+      { "hooks": [{ "type": "http", "url": "http://127.0.0.1:4848/hook", "timeout": 2 }] }
+    ],
+    "PostToolUseFailure": [
+      { "hooks": [{ "type": "http", "url": "http://127.0.0.1:4848/hook", "timeout": 2 }] }
+    ],
+    "SubagentStop": [
+      { "hooks": [{ "type": "http", "url": "http://127.0.0.1:4848/hook", "timeout": 2 }] }
+    ],
+    "Notification": [
+      { "hooks": [{ "type": "http", "url": "http://127.0.0.1:4848/hook", "timeout": 2 }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "http", "url": "http://127.0.0.1:4848/hook", "timeout": 2 }] }
+    ]
+  }
+}
